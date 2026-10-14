@@ -372,6 +372,17 @@
 		renderPicker(picker, (sticker) => showSheet(page, sticker))
 	}
 
+	/**
+	 * What the picker inserts: in Talk the command "/sticker <pack>/<id>", which the
+	 * server turns into the sticker as an image file (shown alone, also by the
+	 * phone apps); elsewhere (Text, …) the sticker's link.
+	 */
+	function pickedText(sticker) {
+		const inTalk = /\/(apps\/spreed|call)(\/|$)/.test(window.location.pathname)
+		const parts = /\/s\/([a-z0-9-]+)\/([A-Za-z0-9-]+)$/.exec(sticker.link)
+		return inTalk && parts ? '/sticker ' + parts[1] + '/' + parts[2] : sticker.link
+	}
+
 	function renderWidget(element, { richObject }) {
 		element.replaceChildren(el('a', {
 			class: 'talk-stickers-widget',
@@ -387,7 +398,7 @@
 		window._vue_richtext_custom_picker_elements[APP] = {
 			id: APP,
 			callback: (element) => renderPicker(element, (sticker) => {
-				element.dispatchEvent(new CustomEvent('submit', { detail: sticker.link }))
+				element.dispatchEvent(new CustomEvent('submit', { detail: pickedText(sticker) }))
 			}),
 			onDestroy: () => {},
 			size: 'large',

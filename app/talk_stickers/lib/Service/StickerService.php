@@ -10,6 +10,7 @@ use OCA\TalkStickers\AppInfo\Application;
 use OCP\App\IAppManager;
 use OCP\Files\File;
 use OCP\Files\Folder;
+use OCP\Files\AppData\IAppDataFactory;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
@@ -37,6 +38,7 @@ class StickerService {
 		private IAppConfig $appConfig,
 		private IRootFolder $rootFolder,
 		private IURLGenerator $urlGenerator,
+		private IAppDataFactory $appDataFactory,
 	) {
 	}
 
@@ -84,13 +86,17 @@ class StickerService {
 	}
 
 	/**
-	 * The link of the sticker that best fits the words of /sticker, or null:
+	 * The sticker that best fits the words of /sticker, as [pack, id], or null:
+	 * "<pack>/<id>" itself (what the picker inserts in Talk),
 	 * an emoji (its sticker), or words matched against names and keywords. A first
 	 * word naming a pack (its id, title or a word of it, "ours" for the shared
 	 * folder) keeps to that pack. Ties go to the shared folder, then to the app
 	 * setting "command_pack" (noto-animated), then to the order of the packs.
 	 */
-	public function search(string $query, ?string $userId): ?string {
+	public function search(string $query, ?string $userId): ?array {
+		if (preg_match('/^([a-z0-9-]+)\/([A-Za-z0-9-]+)$/', trim($query), $exact) === 1) {
+			return $this->find($exact[1], $exact[2], $userId) === null ? null : [$exact[1], $exact[2]];
+		}
 		$words = preg_split('/\s+/u', mb_strtolower(trim($query)), -1, PREG_SPLIT_NO_EMPTY) ?: [];
 		if ($words === []) {
 			return null;
@@ -113,7 +119,7 @@ class StickerService {
 					: self::score($words, mb_strtolower($sticker['name']), mb_strtolower($sticker['keywords']));
 				// Strictly better only: earlier packs win ties.
 				if ($score > $bestScore) {
-					$best = $this->link($pack['link'], $sticker['id']);
+					$best = [$pack['link'], $sticker['id']];
 					$bestScore = $score;
 				}
 			}
@@ -190,6 +196,134 @@ class StickerService {
 			];
 		}
 		return $packs;
+	}
+
+	/**
+	 * A sticker as an image file to send, in what Talk shows best: animated as GIF
+	 * (Talk animates only GIFs), SVG and still WebP as PNG, at most 256 pixels.
+	 * Null when the image cannot be read or converted (no Imagick).
+	 *
+	 * @return array{name: string, data: string, mime: string}|null
+	 */
+	public function imageFile(string $pack, string $id, ?string $userId): ?array {
+		if ($pack === self::FAMILY) {
+			$file = $userId === null ? null : $this->familyFile($userId, $id);
+			if ($file === null) {
+				return null;
+			}
+			$name = pathinfo($file->getName(), PATHINFO_FILENAME);
+			$data = $file->getContent();
+			$mime = $file->getMimetype();
+		} else {
+			$cached = $this->cachedImage($pack, $id);
+			if ($cached !== null) {
+				return $cached;
+			}
+			$sticker = $this->shippedSticker($pack, $id);
+			$path = $sticker === null ? '' : $this->appManager->getAppPath(Application::APP_ID) . '/packs/' . $pack . '/' . $sticker['f'];
+			if ($path === '' || !is_file($path)) {
+				return null;
+			}
+			$name = $sticker['n'];
+			$data = (string)file_get_contents($path);
+			$mime = ['png' => 'image/png', 'gif' => 'image/gif', 'webp' => 'image/webp', 'svg' => 'image/svg+xml'][pathinfo($path, PATHINFO_EXTENSION)] ?? '';
+		}
+		if ($mime === 'image/png' || $mime === 'image/jpeg' || $mime === 'image/gif') {
+			return ['name' => $name, 'data' => $data, 'mime' => $mime];
+		}
+		$converted = $this->convert($data, $mime);
+		if ($converted === null) {
+			return null;
+		}
+		if ($pack !== self::FAMILY) {
+			$this->cacheImage($pack, $id, $name, $converted);
+		}
+		return ['name' => $name, 'data' => $converted['data'], 'mime' => $converted['mime']];
+	}
+
+	/**
+	 * WebP or SVG as GIF (animated) or PNG, at most 256 pixels, or null.
+	 *
+	 * @return array{data: string, mime: string}|null
+	 */
+	private function convert(string $data, string $mime): ?array {
+		if (($mime !== 'image/webp' && $mime !== 'image/svg+xml') || !class_exists(\Imagick::class)) {
+			return null;
+		}
+		try {
+			$image = new \Imagick();
+			$image->setBackgroundColor(new \ImagickPixel('transparent'));
+			if ($mime === 'image/svg+xml') {
+				$image->setResolution(384, 384);
+			}
+			$image->readImageBlob($data);
+			if ($image->getNumberImages() > 1) {
+				$frames = $image->coalesceImages();
+				foreach ($frames as $frame) {
+					$frame->thumbnailImage(256, 256, true);
+					$frame->setImageFormat('gif');
+					$frame->setImageDispose(2);
+				}
+				$frames->setImageIterations(0);
+				return ['data' => $frames->getImagesBlob(), 'mime' => 'image/gif'];
+			}
+			$image->thumbnailImage(256, 256, true);
+			$image->setImageFormat('png');
+			return ['data' => $image->getImageBlob(), 'mime' => 'image/png'];
+		} catch (\ImagickException) {
+			return null;
+		}
+	}
+
+	/**
+	 * A shipped sticker converted before (converting an animated one takes seconds):
+	 * app data converted/<pack>-<id>.gif or .png, the name in a .name file beside it.
+	 */
+	private function cachedImage(string $pack, string $id): ?array {
+		try {
+			$folder = $this->appDataFactory->get(Application::APP_ID)->getFolder('converted');
+			foreach (['gif' => 'image/gif', 'png' => 'image/png'] as $extension => $mime) {
+				if ($folder->fileExists("$pack-$id.$extension")) {
+					return [
+						'name' => $folder->getFile("$pack-$id.name")->getContent(),
+						'data' => $folder->getFile("$pack-$id.$extension")->getContent(),
+						'mime' => $mime,
+					];
+				}
+			}
+		} catch (NotFoundException) {
+		}
+		return null;
+	}
+
+	private function cacheImage(string $pack, string $id, string $name, array $converted): void {
+		try {
+			$appData = $this->appDataFactory->get(Application::APP_ID);
+			try {
+				$folder = $appData->getFolder('converted');
+			} catch (NotFoundException) {
+				$folder = $appData->newFolder('converted');
+			}
+			$extension = $converted['mime'] === 'image/gif' ? 'gif' : 'png';
+			$folder->newFile("$pack-$id.name", $name);
+			$folder->newFile("$pack-$id.$extension", $converted['data']);
+		} catch (\Throwable) {
+			// Converted again next time.
+		}
+	}
+
+	/** A shipped sticker's entry in the index ({i, f, n, …}), or null. */
+	private function shippedSticker(string $pack, string $id): ?array {
+		foreach ($this->shipped()['packs'] ?? [] as $shipped) {
+			if ($shipped['id'] === $pack) {
+				foreach ($shipped['stickers'] as $sticker) {
+					if ($sticker['i'] === $id) {
+						return $sticker;
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	/** The link a sent sticker is: it opens its image and is shown as one. */

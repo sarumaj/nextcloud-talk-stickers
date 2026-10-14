@@ -14,7 +14,13 @@ uploaded as images to a shared folder. A sticker is sent as a link, which Talk s
 - **`/sticker` in any Talk client**, phones included: a message `/sticker party`, `/sticker 🎉`
   or `/sticker twemoji cat` is replaced, before it is saved, by the sticker that fits best (an
   emoji's own sticker, else names and keywords, in English; a first word naming a pack keeps to
-  it, `ours` to your own). Nobody sees the typed text. A bare `/sticker` becomes the link of the
+  it, `ours` to your own). Nobody sees the typed text. The sticker arrives as an **image file**,
+  shown alone by every client: it is saved in the sender's folder of the conversation
+  (`Talk/<conversation>/<sender>/Sticker <name>.gif`, animated ones as GIF, which Talk animates)
+  and the message becomes Talk's message of that file. That needs the folder to be shared with
+  the conversation already, which Talk does once the sender has sent any file there; until then
+  the sticker goes as its link. In Talk, the picker inserts `/sticker <pack>/<id>`, so picked
+  stickers arrive as images too. A bare `/sticker` becomes the link of the
   phone page; words that fit no sticker are sent as typed. Also `/naklejka`; in the web the `/`
   menu opens the picker itself. The default pack is the app setting `command_pack`
   (`noto-animated`).
@@ -37,7 +43,9 @@ uploaded as images to a shared folder. A sticker is sent as a link, which Talk s
       user's own packs.
     - `/sticker` is a listener of Talk's `BeforeChatMessageSentEvent`
       (`lib/Listener/StickerCommandListener.php`), which rewrites the message before it is
-      saved; the search is `StickerService::search()`.
+      saved: into Talk's own `file_shared` message by file id (as Talk 25's attachments are),
+      or the link. The search is `StickerService::search()`; `imageFile()` converts WebP and
+      SVG with Imagick (animated to GIF) and keeps the results in the app data.
     - `/apps/talk_stickers/` is the page for phones (`templates/main.php`, the same script); the
       manifest for the home screen is Nextcloud's own for each app.
 - `packs/` builds the shipped packs into `app/talk_stickers/packs/` (not committed):
