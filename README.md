@@ -11,6 +11,11 @@ uploaded as images to a shared folder. A sticker is sent as a link, which Talk s
   subfolder, for example `Stickers/Dog/Happy.png`. The folder is meant to be a team folder shared
   with everyone who should see the stickers; they are shown only to those who can read it.
 - **Recent:** the stickers last sent from this browser come first.
+- **`/gif <words>`** (also `/gifs`, `/giphy`), and a message that is only a GIPHY link (what the
+  GIPHY picker inserts): the first GIF GIPHY finds, in the sender's language and at the rating of
+  the [GIPHY integration](https://apps.nextcloud.com/apps/integration_giphy), whose API key it
+  uses, arrives as an image file like a sticker (as the GIPHY link while the conversation's folder
+  is not shared yet). Without that app and its key, `/gif` is sent as typed.
 - **`/sticker` in any Talk client**, phones included: a message `/sticker party`, `/sticker 🎉`
   or `/sticker twemoji cat` is replaced, before it is saved, by the sticker that fits best (an
   emoji's own sticker, else names and keywords, in English; a first word naming a pack keeps to

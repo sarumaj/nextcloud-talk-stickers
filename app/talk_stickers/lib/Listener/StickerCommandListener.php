@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace OCA\TalkStickers\Listener;
 
 use OCA\TalkStickers\AppInfo\Application;
+use OCA\TalkStickers\Service\GifService;
 use OCA\TalkStickers\Service\StickerService;
 use OCP\Comments\IComment;
 use OCP\EventDispatcher\Event;
@@ -31,7 +32,12 @@ use Psr\Log\LoggerInterface;
  * and the message becomes Talk's own message of a file there, so every client
  * shows the image alone. Otherwise (no such folder yet, an older Talk) as the
  * sticker's link. A bare "/sticker" becomes the link of the stickers' page; words
- * that fit no sticker stay as typed. Listens to Talk's BeforeChatMessageSentEvent
+ * that fit no sticker stay as typed.
+ *
+ * GIFs alike, from GIPHY with the GIPHY integration's key: "/gif <words>" (also
+ * /gifs, /giphy) becomes the first GIF GIPHY finds, and a message that is only a
+ * GIPHY link (what its picker inserts) that GIF, as an image file; as the GIPHY
+ * link when the folder is not shared yet. Listens to Talk's BeforeChatMessageSentEvent
  * (by name: Talk is not needed to install the app).
  *
  * @template-implements IEventListener<Event>
@@ -39,11 +45,14 @@ use Psr\Log\LoggerInterface;
 class StickerCommandListener implements IEventListener {
 	/** The command's names: English, German, Polish. */
 	private const COMMAND = '/^\/(?:stickers?|naklejk[ai])(?:\s+(.*))?$/isu';
+	/** The GIF command's names. */
+	private const GIF_COMMAND = '/^\/(?:gifs?|giphy)\s+(.+)$/isu';
 	/** Talk's verb of a shared file or object (ChatManager::VERB_OBJECT_SHARED). */
 	private const VERB_OBJECT_SHARED = 'object_shared';
 
 	public function __construct(
 		private StickerService $stickers,
+		private GifService $gifs,
 		private IURLGenerator $urlGenerator,
 		private IL10N $l10n,
 		private IRootFolder $rootFolder,
@@ -57,11 +66,18 @@ class StickerCommandListener implements IEventListener {
 			return;
 		}
 		$comment = $event->getComment();
-		if ($comment->getActorType() !== 'users'
-			|| preg_match(self::COMMAND, trim($comment->getMessage()), $match) !== 1) {
+		if ($comment->getActorType() !== 'users') {
 			return;
 		}
+		$text = trim($comment->getMessage());
 		$userId = $comment->getActorId();
+		if (preg_match(self::GIF_COMMAND, $text, $gifMatch) === 1 || GifService::idOfLink($text) !== null) {
+			$this->sendGif($comment, $event->getRoom(), $userId, $text, trim($gifMatch[1] ?? ''));
+			return;
+		}
+		if (preg_match(self::COMMAND, $text, $match) !== 1) {
+			return;
+		}
 		$query = trim($match[1] ?? '');
 		if ($query === '') {
 			$page = $this->urlGenerator->linkToRouteAbsolute(Application::APP_ID . '.page.index');
@@ -78,18 +94,59 @@ class StickerCommandListener implements IEventListener {
 		}
 	}
 
+	/** /gif <words> or a GIPHY link: the GIF as a file, else its GIPHY link. */
+	private function sendGif(IComment $comment, object $room, string $userId, string $text, string $query): void {
+		if (!$this->gifs->available()) {
+			return;
+		}
+		try {
+			if ($this->sharedConversationFolder($room, $userId) === null) {
+				// No file yet: a GIPHY link, which Talk shows through the GIPHY integration.
+				if ($query !== '') {
+					$gif = $this->gifs->search($query, $userId);
+					if ($gif !== null && $gif['page'] !== '') {
+						$comment->setMessage($gif['page']);
+					}
+				}
+				return;
+			}
+			$id = GifService::idOfLink($text);
+			$gif = $id !== null ? $this->gifs->byId($id) : $this->gifs->search($query, $userId);
+			if ($gif === null) {
+				return;
+			}
+			if (!$this->sendImage($comment, $room, $userId, $gif, 'GIF') && $id === null && $gif['page'] !== '') {
+				$comment->setMessage($gif['page']);
+			}
+		} catch (\Throwable $e) {
+			$this->logger->warning('Sending a GIF failed', ['exception' => $e]);
+		}
+	}
+
 	/** Turns the message into Talk's message of the sticker as a file; whether it could. */
 	private function sendAsFile(IComment $comment, object $room, string $userId, string $pack, string $id): bool {
+		try {
+			$image = $this->sharedConversationFolder($room, $userId) === null ? null : $this->stickers->imageFile($pack, $id, $userId);
+			return $image !== null && $this->sendImage($comment, $room, $userId, $image, $this->l10n->t('Sticker'));
+		} catch (\Throwable $e) {
+			$this->logger->warning('Sending a sticker as a file failed, it goes as a link', ['exception' => $e]);
+			return false;
+		}
+	}
+
+	/**
+	 * Turns the message into Talk's message of an image file, saved in the author's
+	 * shared folder of the conversation as "<prefix> <name>"; whether it could.
+	 *
+	 * @param array{name: string, data: string, mime: string} $image
+	 */
+	private function sendImage(IComment $comment, object $room, string $userId, array $image, string $prefix): bool {
 		try {
 			$folder = $this->sharedConversationFolder($room, $userId);
 			if ($folder === null) {
 				return false;
 			}
-			$image = $this->stickers->imageFile($pack, $id, $userId);
-			if ($image === null) {
-				return false;
-			}
-			$file = $this->stickerFile($folder, $image);
+			$file = $this->imageFileIn($folder, $image, $prefix);
 			$comment->setVerb(self::VERB_OBJECT_SHARED);
 			$comment->setMessage(json_encode([
 				'message' => 'file_shared',
@@ -97,7 +154,7 @@ class StickerCommandListener implements IEventListener {
 			], JSON_THROW_ON_ERROR));
 			return true;
 		} catch (\Throwable $e) {
-			$this->logger->warning('Sending a sticker as a file failed, it goes as a link', ['exception' => $e]);
+			$this->logger->warning('Sending an image file failed', ['exception' => $e]);
 			return false;
 		}
 	}
@@ -132,17 +189,17 @@ class StickerCommandListener implements IEventListener {
 		return null;
 	}
 
-	/** The sticker's file in the folder: the one sent before, or a new one. */
-	private function stickerFile(Folder $folder, array $image): File {
+	/** The image's file in the folder: the same one sent before, or a new one. */
+	private function imageFileIn(Folder $folder, array $image, string $prefix): File {
 		$extension = ['image/gif' => 'gif', 'image/png' => 'png', 'image/jpeg' => 'jpg'][$image['mime']] ?? 'png';
 		$base = trim(preg_replace('/[\\\\\\/:*?"<>|\\x00-\\x1f]+/u', ' ', $image['name']) ?? '') ?: 'sticker';
-		$name = $this->l10n->t('Sticker') . ' ' . $base . '.' . $extension;
+		$name = $prefix . ' ' . $base . '.' . $extension;
 		if ($folder->nodeExists($name)) {
 			$existing = $folder->get($name);
 			if ($existing instanceof File && $existing->getContent() === $image['data']) {
 				return $existing;
 			}
-			$name = $this->l10n->t('Sticker') . ' ' . $base . ' ' . substr(sha1($image['data']), 0, 8) . '.' . $extension;
+			$name = $prefix . ' ' . $base . ' ' . substr(sha1($image['data']), 0, 8) . '.' . $extension;
 			if ($folder->nodeExists($name)) {
 				$existing = $folder->get($name);
 				if ($existing instanceof File) {
