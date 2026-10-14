@@ -11,6 +11,10 @@ uploaded as images to a shared folder. A sticker is sent as a link, which Talk s
   subfolder, for example `Stickers/Dog/Happy.png`. The folder is meant to be a team folder shared
   with everyone who should see the stickers; they are shown only to those who can read it.
 - **Recent:** the stickers last sent from this browser come first.
+- **On phones:** the Talk apps have no Smart Picker, so the app has a page of its own,
+  `/apps/talk_stickers/` (*Stickers* in the app menu), to add to the home screen. Tapping a sticker
+  shows it with **Share**, which hands the image to the phone's share sheet (choose Talk and the
+  conversation), and **Copy link**, for pasting into Talk. SVG stickers are shared as PNG.
 
 ## How it works
 
@@ -24,6 +28,8 @@ uploaded as images to a shared folder. A sticker is sent as a link, which Talk s
       widget register through the global registries of `@nextcloud/vue`, so they need no bundler.
     - `/apps/talk_stickers/api/packs` returns the catalogue: the shipped packs' index and the
       user's own packs.
+    - `/apps/talk_stickers/` is the page for phones (`templates/main.php`, the same script); the
+      manifest for the home screen is Nextcloud's own for each app.
 - `packs/` builds the shipped packs into `app/talk_stickers/packs/` (not committed):
     - `manifest.json` pins each source: the archives with their SHA-256, Unicode's emoji list for
       names and groups. Noto's images come from Google's emoji CDN, which offers no pinned version.

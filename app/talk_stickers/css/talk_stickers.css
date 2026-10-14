@@ -113,3 +113,84 @@
 	height: 160px;
 	object-fit: contain;
 }
+
+/* The page for phones: the picker fills the content area. */
+.talk-stickers-page {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	max-width: 900px;
+	margin: 0 auto;
+}
+
+.talk-stickers-page__picker {
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+.talk-stickers-page__tip {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 8px;
+	padding: 8px 12px;
+	border-radius: var(--border-radius-large, 10px);
+	background-color: var(--color-primary-element-light, var(--color-background-dark));
+}
+
+.talk-stickers-page__tip button {
+	flex-shrink: 0;
+}
+
+/* The chosen sticker, over the page, with Share and Copy link. */
+.talk-stickers-sheet {
+	position: fixed;
+	inset: 0;
+	z-index: 10000;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+.talk-stickers-sheet__panel {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	max-width: 480px;
+	padding: 16px 16px max(16px, env(safe-area-inset-bottom));
+	border-radius: var(--border-radius-large, 10px) var(--border-radius-large, 10px) 0 0;
+	background-color: var(--color-main-background);
+	box-sizing: border-box;
+}
+
+.talk-stickers-sheet__image {
+	width: 180px;
+	height: 180px;
+	object-fit: contain;
+}
+
+.talk-stickers-sheet__name {
+	font-weight: bold;
+}
+
+.talk-stickers-sheet__actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 8px;
+}
+
+.talk-stickers-sheet__actions button {
+	min-height: 44px;
+	padding: 0 20px;
+}
+
+.talk-stickers-sheet__status {
+	min-height: 1.5em;
+	color: var(--color-text-maxcontrast);
+	text-align: center;
+	word-break: break-all;
+}

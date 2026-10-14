@@ -3,11 +3,11 @@
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>talk_stickers</id>
     <name>Talk stickers</name>
-    <summary>Stickers for Talk, sent from the Smart Picker</summary>
+    <summary>Stickers for Talk: from the Smart Picker, or shared from your phone</summary>
     <description><![CDATA[Send stickers in Talk (and wherever the Smart Picker is offered): open-licensed emoji packs (Fluent Emoji, Noto Emoji, also animated, OpenMoji, Twemoji) and your own, uploaded as images to a shared folder.
 
-A sticker is sent as a link, which Talk shows as the image.]]></description>
-    <version>1.0.0</version>
+A sticker is sent as a link, which Talk shows as the image. On phones, whose Talk apps have no Smart Picker, the app's own page (to add to the home screen) shares a sticker to Talk as an image.]]></description>
+    <version>1.1.0</version>
     <licence>agpl</licence>
     <author>Dawid Ciepiela</author>
     <namespace>TalkStickers</namespace>
@@ -15,6 +15,13 @@ A sticker is sent as a link, which Talk shows as the image.]]></description>
     <website>https://git.ciepiela.org/dawid/nextcloud-talk-stickers</website>
     <bugs>https://git.ciepiela.org/dawid/nextcloud-talk-stickers/issues</bugs>
     <repository>https://git.ciepiela.org/dawid/nextcloud-talk-stickers</repository>
+    <navigations>
+        <navigation>
+            <name>Stickers</name>
+            <route>talk_stickers.page.index</route>
+            <icon>app.svg</icon>
+        </navigation>
+    </navigations>
     <dependencies>
         <nextcloud min-version="32" max-version="36"/>
     </dependencies>
