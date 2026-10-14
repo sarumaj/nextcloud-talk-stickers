@@ -1,6 +1,7 @@
 OC.L10N.register(
     "talk_stickers",
     {
+        "Stickers: %s": "Sticker: %s",
         "Stickers": "Sticker",
         "Recent": "Zuletzt",
         "Ours": "Unsere",

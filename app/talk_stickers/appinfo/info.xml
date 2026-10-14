@@ -6,8 +6,8 @@
     <summary>Stickers for Talk: from the Smart Picker, or shared from your phone</summary>
     <description><![CDATA[Send stickers in Talk (and wherever the Smart Picker is offered): open-licensed emoji packs (Fluent Emoji, Noto Emoji, also animated, OpenMoji, Twemoji) and your own, uploaded as images to a shared folder.
 
-A sticker is sent as a link, which Talk shows as the image. On phones, whose Talk apps have no Smart Picker, the app's own page (to add to the home screen) shares a sticker to Talk as an image.]]></description>
-    <version>1.2.0</version>
+A sticker is sent as a link, which Talk shows as the image. On phones, whose Talk apps have no Smart Picker, the app's own page (to add to the home screen) shares a sticker to Talk as an image, and a message "/sticker party" (or an emoji) becomes the sticker in every Talk client.]]></description>
+    <version>1.3.0</version>
     <licence>agpl</licence>
     <author>Dawid Ciepiela</author>
     <namespace>TalkStickers</namespace>

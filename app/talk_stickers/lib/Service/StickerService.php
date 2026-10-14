@@ -83,6 +83,115 @@ class StickerService {
 		return null;
 	}
 
+	/**
+	 * The link of the sticker that best fits the words of /sticker, or null:
+	 * an emoji (its sticker), or words matched against names and keywords. A first
+	 * word naming a pack (its id, title or a word of it, "ours" for the shared
+	 * folder) keeps to that pack. Ties go to the shared folder, then to the app
+	 * setting "command_pack" (noto-animated), then to the order of the packs.
+	 */
+	public function search(string $query, ?string $userId): ?string {
+		$words = preg_split('/\s+/u', mb_strtolower(trim($query)), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+		if ($words === []) {
+			return null;
+		}
+		$packs = $this->searchablePacks($userId);
+		if (count($words) > 1) {
+			$chosen = array_filter($packs, fn (array $pack) => in_array($words[0], $pack['names'], true));
+			if ($chosen !== []) {
+				$packs = $chosen;
+				array_shift($words);
+			}
+		}
+		$emoji = self::emojiId(implode('', $words));
+		$best = null;
+		$bestScore = 0;
+		foreach ($packs as $pack) {
+			foreach ($pack['stickers'] as $sticker) {
+				$score = $emoji !== null
+					? ($sticker['id'] === $emoji ? 1000 : 0)
+					: self::score($words, mb_strtolower($sticker['name']), mb_strtolower($sticker['keywords']));
+				// Strictly better only: earlier packs win ties.
+				if ($score > $bestScore) {
+					$best = $this->link($pack['link'], $sticker['id']);
+					$bestScore = $score;
+				}
+			}
+		}
+		return $best;
+	}
+
+	/** The id an emoji's sticker has (its code points, without variation selectors), or null for words. */
+	public static function emojiId(string $text): ?string {
+		if ($text === '' || preg_match('/^[\p{L}\p{N}\p{P}\s]+$/u', $text) === 1) {
+			return null;
+		}
+		$points = [];
+		foreach (mb_str_split($text) as $char) {
+			$point = mb_ord($char);
+			if ($point !== 0xFE0F && $point !== 0xFE0E) {
+				$points[] = dechex($point);
+			}
+		}
+		return implode('-', $points);
+	}
+
+	/**
+	 * How well words fit a sticker: the whole name, every word as a word of the
+	 * name, as the start of one, or among the keywords; 0 when a word fits nowhere.
+	 */
+	public static function score(array $words, string $name, string $keywords): int {
+		$query = implode(' ', $words);
+		if ($name === $query) {
+			return 1000;
+		}
+		$nameWords = preg_split('/[\s_:,-]+/u', $name, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+		$keywordList = preg_split('/\s+/u', $keywords, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+		$score = 0;
+		foreach ($words as $word) {
+			if (in_array($word, $nameWords, true)) {
+				$score += 10;
+			} elseif (array_filter($nameWords, fn (string $w) => str_starts_with($w, $word)) !== []) {
+				$score += 6;
+			} elseif (in_array($word, $keywordList, true)) {
+				$score += 4;
+			} elseif (array_filter($keywordList, fn (string $w) => str_starts_with($w, $word)) !== []) {
+				$score += 2;
+			} else {
+				return 0;
+			}
+		}
+		// Of equal fits, the shorter name: "party popper" over "party popper with confetti".
+		return $score * 10 - min(count($nameWords), 9);
+	}
+
+	/**
+	 * The packs /sticker searches, in the order that wins ties, each with the
+	 * names a first word may give it: [{names, link, stickers: [{id, name, keywords}]}].
+	 */
+	private function searchablePacks(?string $userId): array {
+		$packs = [];
+		foreach ($userId === null ? [] : $this->familyPacks($userId) as $pack) {
+			$packs[] = [
+				'names' => ['ours', 'own', self::FAMILY, mb_strtolower($pack['title'])],
+				'link' => self::FAMILY,
+				'stickers' => array_map(fn (array $s) => ['id' => $s['i'], 'name' => $s['n'], 'keywords' => ''], $pack['stickers']),
+			];
+		}
+		$shipped = $this->shipped()['packs'] ?? [];
+		$first = $this->appConfig->getValueString(Application::APP_ID, 'command_pack', 'noto-animated');
+		usort($shipped, fn (array $a, array $b) => ($b['id'] === $first) <=> ($a['id'] === $first));
+		foreach ($shipped as $pack) {
+			$title = mb_strtolower($pack['title']);
+			$packs[] = [
+				'names' => array_merge([$pack['id']], explode('-', $pack['id']), [$title], preg_split('/[\s()]+/u', $title, -1, PREG_SPLIT_NO_EMPTY) ?: []),
+				'link' => $pack['id'],
+				'stickers' => array_map(fn (array $s) => ['id' => $s['i'], 'name' => $s['n'], 'keywords' => $s['k'] ?? ''], $pack['stickers']),
+			];
+		}
+		return $packs;
+	}
+
 	/** The link a sent sticker is: it opens its image and is shown as one. */
 	public function link(string $pack, string $id): string {
 		return $this->urlGenerator->linkToRouteAbsolute(Application::APP_ID . '.sticker.show', ['pack' => $pack, 'id' => $id]);

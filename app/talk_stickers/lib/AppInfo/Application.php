@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace OCA\TalkStickers\AppInfo;
 
 use OCA\TalkStickers\Listener\RenderReferenceListener;
+use OCA\TalkStickers\Listener\StickerCommandListener;
 use OCA\TalkStickers\Reference\StickerReferenceProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -28,6 +29,8 @@ class Application extends App implements IBootstrap {
 		// Pages that offer the Smart Picker or show references (Talk, Text, …)
 		// announce it with this event: only then are the picker and widget loaded.
 		$context->registerEventListener(RenderReferenceEvent::class, RenderReferenceListener::class);
+		// /sticker in Talk's chat (by name: Talk is optional).
+		$context->registerEventListener('OCA\\Talk\\Events\\BeforeChatMessageSentEvent', StickerCommandListener::class);
 	}
 
 	public function boot(IBootContext $context): void {
