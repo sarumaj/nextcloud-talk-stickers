@@ -8,7 +8,7 @@
     },
     "require-dev": {
         "nextcloud/ocp": "dev-stable32",
-        "phpunit/phpunit": "^11.5"
+        "phpunit/phpunit": "^13.0"
     },
     "autoload-dev": {
         "psr-4": {
