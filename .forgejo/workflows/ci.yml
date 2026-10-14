@@ -1,0 +1,52 @@
+---
+# The app's PHP and JavaScript must at least parse; the pack builder's tests run
+# without network. The packs themselves are built on the server (README).
+name: CI
+"on":
+  push:
+    branches: [main, renovate/all-patch]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  php:
+    runs-on: docker
+    container: docker.io/library/php:8.4-cli
+    timeout-minutes: 10
+    steps:
+      - name: Check out
+        run: &checkout |
+          apt-get update -qq && apt-get install -qq -y git >/dev/null
+          git init -q . && git remote add origin "${{ github.server_url }}/${{ github.repository }}.git"
+          git fetch -q --depth 1 origin "${{ github.sha }}"
+          git checkout -q FETCH_HEAD
+
+      - name: Lint the PHP files
+        run: find app -name '*.php' -print0 | xargs -0 -n1 php -l
+
+  javascript-and-packs:
+    runs-on: docker
+    container: docker.io/library/node:24-bookworm
+    timeout-minutes: 10
+    steps:
+      - name: Check out
+        run: |
+          git init -q . && git remote add origin "${{ github.server_url }}/${{ github.repository }}.git"
+          git fetch -q --depth 1 origin "${{ github.sha }}"
+          git checkout -q FETCH_HEAD
+
+      - name: Check the JavaScript parses
+        run: for f in app/talk_stickers/js/*.js app/talk_stickers/l10n/*.js; do node --check "$f"; done
+
+      - name: Check the translations are valid JSON
+        run: for f in app/talk_stickers/l10n/*.json; do node -e "JSON.parse(require('fs').readFileSync('$f'))"; done
+
+      - name: Test the pack builder
+        run: |
+          apt-get update -qq && apt-get install -qq -y python3 >/dev/null
+          cd packs && python3 -m unittest -v test_build

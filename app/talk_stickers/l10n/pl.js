@@ -1,0 +1,16 @@
+OC.L10N.register(
+    "talk_stickers",
+    {
+        "Stickers": "Naklejki",
+        "Recent": "Ostatnie",
+        "Ours": "Nasze",
+        "Search stickers": "Szukaj naklejek",
+        "Loading stickers …": "Wczytywanie naklejek …",
+        "Show more": "Pokaż więcej",
+        "Add your own stickers: upload images to the folder “{folder}” in Files, one subfolder per pack.": "Dodaj własne naklejki: prześlij obrazy do folderu „{folder}” w Plikach, jeden podfolder na pakiet.",
+        "Open the folder": "Otwórz folder",
+        "No stickers found": "Nie znaleziono naklejek",
+        "The stickers could not be loaded.": "Nie udało się wczytać naklejek."
+    },
+    "nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || n!=1 && (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);"
+);

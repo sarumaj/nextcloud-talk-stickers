@@ -1,0 +1,72 @@
+{
+  "unicode": {
+    "url": "https://www.unicode.org/Public/17.0.0/emoji/emoji-test.txt",
+    "sha256": "1d8a944f88d7952f7ef7c5167fef3c67995bcae24543949710231b03a201acda"
+  },
+  "packs": [
+    {
+      "id": "fluent",
+      "kind": "fluent",
+      "title": "Fluent Emoji",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/microsoft/fluentui-emoji/blob/1ffb34c752ecf5d402f04cfb4b392c77f57c54bc/LICENSE",
+      "source": "https://github.com/microsoft/fluentui-emoji",
+      "attribution": "Fluent Emoji © Microsoft Corporation, MIT License",
+      "archive": {
+        "url": "https://github.com/microsoft/fluentui-emoji/archive/1ffb34c752ecf5d402f04cfb4b392c77f57c54bc.tar.gz",
+        "sha256": "5fc28b1d47e1b60c70b0b1213bca37850a7702f157bc2492e80178de00840701"
+      }
+    },
+    {
+      "id": "noto-animated",
+      "kind": "noto-animated",
+      "title": "Noto Emoji (animated)",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "source": "https://googlefonts.github.io/noto-emoji-animation/",
+      "attribution": "Animated Noto Emoji © Google LLC, CC BY 4.0",
+      "index": "https://googlefonts.github.io/noto-emoji-animation/data/api.json",
+      "url": "https://fonts.gstatic.com/s/e/notoemoji/latest/{codepoint}/512.webp"
+    },
+    {
+      "id": "noto",
+      "kind": "noto",
+      "title": "Noto Emoji",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://www.apache.org/licenses/LICENSE-2.0",
+      "source": "https://github.com/googlefonts/noto-emoji",
+      "attribution": "Noto Emoji © Google LLC, Apache License 2.0",
+      "url": "https://fonts.gstatic.com/s/e/notoemoji/latest/{codepoint}/512.png"
+    },
+    {
+      "id": "openmoji",
+      "kind": "openmoji",
+      "title": "OpenMoji",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "source": "https://openmoji.org/",
+      "attribution": "All emojis designed by OpenMoji – the open-source emoji and icon project, CC BY-SA 4.0",
+      "archive": {
+        "url": "https://github.com/hfg-gmuend/openmoji/releases/download/17.0.0/openmoji-618x618-color.zip",
+        "sha256": "569628cc330a2c4ae2c38bbb2def190e08bb5fe4a76e657ea4bcc46bd2015d44"
+      },
+      "metadata": {
+        "url": "https://raw.githubusercontent.com/hfg-gmuend/openmoji/17.0.0/data/openmoji.json",
+        "sha256": "ab181dd523021dfbe2b98a13d96ab384b7b3014d17815261bc267fb39d9a211b"
+      }
+    },
+    {
+      "id": "twemoji",
+      "kind": "twemoji",
+      "title": "Twemoji",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "source": "https://github.com/jdecked/twemoji",
+      "attribution": "Twemoji © Twitter, Inc and other contributors, CC BY 4.0",
+      "archive": {
+        "url": "https://github.com/jdecked/twemoji/archive/refs/tags/v17.0.3.tar.gz",
+        "sha256": "a0855654b633045ae2337537e77f1bb4361162f7fcd910e613eaab1d6d9c5fca"
+      }
+    }
+  ]
+}
