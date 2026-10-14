@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace OCA\TalkStickers\AppInfo;
 
+use OCA\TalkStickers\Listener\QuietFolderShareListener;
 use OCA\TalkStickers\Listener\RenderReferenceListener;
 use OCA\TalkStickers\Listener\StickerCommandListener;
 use OCA\TalkStickers\Reference\StickerReferenceProvider;
@@ -31,6 +32,9 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(RenderReferenceEvent::class, RenderReferenceListener::class);
 		// /sticker in Talk's chat (by name: Talk is optional).
 		$context->registerEventListener('OCA\\Talk\\Events\\BeforeChatMessageSentEvent', StickerCommandListener::class);
+		// Before Talk's own listeners (priority 0): no "shared a folder" for the folder share /sticker makes.
+		$context->registerEventListener(\OCP\Share\Events\ShareCreatedEvent::class, QuietFolderShareListener::class, 100);
+		$context->registerEventListener('OCA\\Talk\\Events\\BeforeDuplicateShareSentEvent', QuietFolderShareListener::class, 100);
 	}
 
 	public function boot(IBootContext $context): void {

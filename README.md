@@ -71,13 +71,13 @@ choose Talk and the conversation, or **Copy link** and paste it into Talk.
 **Your own stickers:** put PNG, JPEG, GIF or WebP images in a subfolder of the `Stickers` folder.
 Each subfolder is a pack, for example `Stickers/Dog/Happy.png`.
 
-### Why the first sticker in a conversation can arrive as a link
+### Where sent stickers are kept
 
-A sticker sent as a picture is saved in your folder for that conversation, `Talk/<conversation>/
-<you>/`, which Talk shares with the conversation the first time you send any file there. The app
-doesn't create that share itself, because Talk would announce it in the chat. So in a conversation
-where you've never sent a file, stickers and GIFs arrive as links. Send any file once, and from
-then on they arrive as pictures.
+A sticker or GIF sent as a picture is saved in your folder for that conversation,
+`Talk/<conversation>/<you>/`, the folder Talk uses for your attachments there; a sticker you send
+again reuses its file. If the folder doesn't exist yet, the app creates it and shares it with the
+conversation, as Talk does for your first attachment, but without Talk's "shared a folder" message.
+Stickers count against your storage quota, a few hundred kilobytes each at most.
 
 ## Settings
 
@@ -95,9 +95,8 @@ The rating and language of GIFs come from the GIPHY integration's own settings.
 
 - **The picker shows no packs:** the packs aren't built yet. Check that background jobs run by
   cron, or run `occ talk_stickers:packs`, which shows each pack as it's done.
-- **Stickers or GIFs arrive as links:** see
-  [above](#why-the-first-sticker-in-a-conversation-can-arrive-as-a-link). Also check that Talk is
-  25 or later, and that Imagick is installed (`php -m | grep imagick`).
+- **Stickers or GIFs arrive as links:** the sender has no free storage quota, Talk is older than
+  25, or Imagick is missing (`php -m | grep imagick`). The server log says which.
 - **`/gif` is sent as typed:** the GIPHY integration is missing or has no API key.
 
 ## How it works
@@ -109,7 +108,9 @@ The app (`app/talk_stickers/`) is PHP and plain JavaScript, with no build step.
   (`/apps/talk_stickers/s/<pack>/<id>`) as the sticker.
 - **`/sticker` and `/gif`:** `lib/Listener/StickerCommandListener.php` listens to Talk's
   `BeforeChatMessageSentEvent`. It finds the sticker (`StickerService::search()`) or the GIF
-  (`GifService`), saves it in the sender's conversation folder, and rewrites the message into
+  (`GifService`), saves it in the sender's conversation folder (made and shared with Talk's own
+  `ConversationFolderService` when missing; `QuietFolderShareListener` keeps Talk from announcing
+  that share), and rewrites the message into
   Talk's own message of that file, which refers to it by file id, as Talk 25's attachments do.
   WebP and SVG stickers are converted with Imagick; the results are kept in the app data.
 - **Packs:** `lib/Packs/Builder.php` builds them into the app data from the sources pinned in

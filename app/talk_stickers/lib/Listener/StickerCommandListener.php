@@ -30,8 +30,9 @@ use Psr\Log\LoggerInterface;
  * sticker is put into the author's folder of the conversation (Talk/<conversation>/
  * <author>/, which Talk shares with the conversation once a file was sent there)
  * and the message becomes Talk's own message of a file there, so every client
- * shows the image alone. Otherwise (no such folder yet, an older Talk) as the
- * sticker's link. A bare "/sticker" becomes the link of the stickers' page; words
+ * shows the image alone. The first time, the folder is made and shared like
+ * for an attachment (QuietFolderShareListener keeps Talk from announcing it).
+ * Otherwise (no quota, an older Talk, any failure) as the sticker's link. A bare "/sticker" becomes the link of the stickers' page; words
  * that fit no sticker stay as typed.
  *
  * GIFs alike, from GIPHY with the GIPHY integration's key: "/gif <words>" (also
@@ -160,15 +161,34 @@ class StickerCommandListener implements IEventListener {
 	}
 
 	/**
-	 * The author's folder of the conversation, when Talk already shares it with the
-	 * conversation (it does once a file was sent there). Creating that share here
-	 * would make Talk post a message of its own about the folder.
+	 * The author's folder of the conversation, shared with it: as Talk made it for
+	 * an attachment, or made now by Talk's ConversationFolderService, without Talk's
+	 * message about the new share. Null without Talk 25's conversation folders or
+	 * when it cannot be made (no quota).
 	 */
 	private function sharedConversationFolder(object $room, string $userId): ?Folder {
 		$config = Server::get('OCA\\Talk\\Config');
 		if (!$config->isConversationSubfoldersEnabled()) {
 			return null;
 		}
+		$folder = $this->existingSharedFolder($config, $room, $userId);
+		if ($folder !== null) {
+			return $folder;
+		}
+		QuietFolderShareListener::$quietFor = $room->getToken();
+		try {
+			$folder = Server::get('OCA\\Talk\\Service\\ConversationFolderService')->getOrCreateSubfolder($userId, $room, false);
+		} catch (\Throwable $e) {
+			$this->logger->info('No conversation folder for stickers: ' . $e->getMessage());
+			return null;
+		} finally {
+			QuietFolderShareListener::$quietFor = null;
+		}
+		return $this->existingSharedFolder($config, $room, $userId);
+	}
+
+	/** The author's folder of the conversation, if it exists and is shared with it. */
+	private function existingSharedFolder(object $config, object $room, string $userId): ?Folder {
 		$path = ltrim($config->getAttachmentFolder($userId), '/') . '/'
 			. $config->getConversationFolderName($room, $userId) . '/'
 			. $config->getConversationSubfolderName($userId, false);

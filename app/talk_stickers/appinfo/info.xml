@@ -14,7 +14,7 @@
 - **A sticker page for phones**, to add to the home screen and share stickers to Talk
 
 After installation a background job downloads the packs (about 300 MB, a few minutes; or run `occ talk_stickers:packs`). Stickers and GIFs are sent as pictures with Talk 25 or later.]]></description>
-    <version>1.6.1</version>
+    <version>1.6.2</version>
     <licence>agpl</licence>
     <author>Dawid Ciepiela</author>
     <namespace>TalkStickers</namespace>
