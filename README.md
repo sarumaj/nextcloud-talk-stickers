@@ -1,95 +1,143 @@
 # Stickers for Nextcloud Talk
 
-A Nextcloud app, `talk_stickers`, that adds **Stickers** to the Smart Picker of Talk (and of every
-other app that offers the picker, such as Text): open-licensed emoji packs and your own stickers,
-uploaded as images to a shared folder. A sticker is sent as a link, which Talk shows as the image.
+Send stickers and GIFs in [Nextcloud Talk](https://apps.nextcloud.com/apps/spreed), from the
+browser, the desktop app and the Talk apps for Android and iOS.
 
-- **Shipped packs:** Fluent Emoji (3D), Noto Emoji (animated and still), OpenMoji and Twemoji,
-  about 7,500 stickers. Their licences and attributions are listed in [NOTICE.md](NOTICE.md) and
-  shown under each pack in the picker.
-- **Your own:** images (PNG, JPEG, GIF, WebP) in subfolders of the folder `Stickers`, one pack per
-  subfolder, for example `Stickers/Dog/Happy.png`. The folder is meant to be a team folder shared
-  with everyone who should see the stickers; they are shown only to those who can read it.
-- **Recent:** the stickers last sent from this browser come first.
-- **`/gif <words>`** (also `/gifs`, `/giphy`), and a message that is only a GIPHY link (what the
-  GIPHY picker inserts): the first GIF GIPHY finds, in the sender's language and at the rating of
-  the [GIPHY integration](https://apps.nextcloud.com/apps/integration_giphy), whose API key it
-  uses, arrives as an image file like a sticker (as the GIPHY link while the conversation's folder
-  is not shared yet). Without that app and its key, `/gif` is sent as typed.
-- **`/sticker` in any Talk client**, phones included: a message `/sticker party`, `/sticker 🎉`
-  or `/sticker twemoji cat` is replaced, before it is saved, by the sticker that fits best (an
-  emoji's own sticker, else names and keywords, in English; a first word naming a pack keeps to
-  it, `ours` to your own). Nobody sees the typed text. The sticker arrives as an **image file**,
-  shown alone by every client: it is saved in the sender's folder of the conversation
-  (`Talk/<conversation>/<sender>/Sticker <name>.gif`, animated ones as GIF, which Talk animates)
-  and the message becomes Talk's message of that file. That needs the folder to be shared with
-  the conversation already, which Talk does once the sender has sent any file there; until then
-  the sticker goes as its link. In Talk, the picker inserts `/sticker <pack>/<id>`, so picked
-  stickers arrive as images too. A bare `/sticker` becomes the link of the
-  phone page; words that fit no sticker are sent as typed. Also `/naklejka`; in the web the `/`
-  menu opens the picker itself. The default pack is the app setting `command_pack`
-  (`noto-animated`).
-- **On phones:** the Talk apps have no Smart Picker, so the app has a page of its own,
-  `/apps/talk_stickers/` (*Stickers* in the app menu), to add to the home screen. Tapping a sticker
-  shows it with **Share**, which hands the image to the phone's share sheet (choose Talk and the
-  conversation), and **Copy link**, for pasting into Talk. SVG stickers are shared as PNG.
+- **About 8,400 stickers** in five open-licensed packs: Fluent Emoji (3D), Noto Emoji (animated
+  and still), OpenMoji and Twemoji. Your server downloads them after installation.
+- **Your own stickers:** upload images to a shared folder, and everyone who can read the folder
+  can send them.
+- **Stickers arrive as pictures:** animated ones keep moving, and there's no link text around them.
+- **`/sticker party`** or **`/sticker 🎉`** sends a sticker from any Talk client, phones included.
+- **`/gif happy dance`** sends a GIF from GIPHY, if the
+  [GIPHY integration](https://apps.nextcloud.com/apps/integration_giphy) is set up.
+- **A sticker page for phones:** you can add it to your home screen and share a sticker to Talk
+  through the phone's share sheet.
 
-## How it works
+## Requirements
 
-- `app/talk_stickers/` is the app (PHP and plain JavaScript, no build step).
-    - The Smart Picker's provider and the preview of a sent sticker are a reference provider
-      (`lib/Reference/StickerReferenceProvider.php`): a link to
-      `/apps/talk_stickers/s/<pack>/<id>` is shown as the sticker (rich object
-      `talk_stickers_sticker`, rendered by `js/talk_stickers.js`). Clients without the widget,
-      such as the mobile apps, show the link's preview image.
-    - The picker itself is a custom element of the Smart Picker (`js/talk_stickers.js`). Picker and
-      widget register through the global registries of `@nextcloud/vue`, so they need no bundler.
-    - `/apps/talk_stickers/api/packs` returns the catalogue: the shipped packs' index and the
-      user's own packs.
-    - `/sticker` is a listener of Talk's `BeforeChatMessageSentEvent`
-      (`lib/Listener/StickerCommandListener.php`), which rewrites the message before it is
-      saved: into Talk's own `file_shared` message by file id (as Talk 25's attachments are),
-      or the link. The search is `StickerService::search()`; `imageFile()` converts WebP and
-      SVG with Imagick (animated to GIF) and keeps the results in the app data.
-    - `/apps/talk_stickers/` is the page for phones (`templates/main.php`, the same script); the
-      manifest for the home screen is Nextcloud's own for each app.
-- `packs/` builds the shipped packs into `app/talk_stickers/packs/` (not committed):
-    - `manifest.json` pins each source: the archives with their SHA-256, Unicode's emoji list for
-      names and groups. Noto's images come from Google's emoji CDN, which offers no pinned version.
-    - `build.py` (Python 3, standard library only) downloads, checks and writes one directory per
-      pack and `index.json`; skin-tone variants are left out. It replaces the output only once the
-      new one is complete.
+- Nextcloud 32 to 36 with Talk. Talk 25 or later sends stickers and GIFs as pictures; older
+  versions send them as links.
+- PHP with the `zip` extension. Imagick (with SVG and WebP support) converts animated stickers to
+  GIF, which Talk animates; without it, those stickers are sent as links.
+- Background jobs run by cron, as Nextcloud recommends. The sticker packs are built by a
+  background job.
+- About 600 MB of disk space in the app data for the packs. The server needs to reach GitHub,
+  unicode.org and fonts.gstatic.com once, to download them.
 
 ## Installing
 
-The app is not in the app store. On the server:
+1. Install **Talk stickers** from the app store (*Apps*, *Social & communication*). Or unpack a
+   release's `talk_stickers-X.Y.Z.tar.gz` into `custom_apps/` and run
+   `occ app:enable talk_stickers`.
+2. Wait for the packs. A background job downloads and builds them; this takes a few minutes.
+   To build them at once instead, run:
 
-```bash
-git clone https://git.ciepiela.org/dawid/nextcloud-talk-stickers.git
-rsync -a --delete --exclude /packs/ nextcloud-talk-stickers/app/talk_stickers/ <nextcloud>/custom_apps/talk_stickers/
-python3 nextcloud-talk-stickers/packs/build.py --out <nextcloud>/custom_apps/talk_stickers/packs
-chown -R www-data: <nextcloud>/custom_apps/talk_stickers
-occ app:enable talk_stickers
-```
+   ```bash
+   occ talk_stickers:packs
+   ```
 
-The build downloads about 300 MB and writes about 600 MB, most of it Noto's animated stickers.
-For your own stickers, create a team folder `Stickers` (app *Team folders*) shared with the people
-who should see them. Another folder name is set with
-`occ config:app:set talk_stickers folder --value <name>`.
+3. Optional, for your own stickers: install **Team folders**, create a team folder named
+   `Stickers` and share it with the people who should see them.
+4. Optional, for GIFs: install the **GIPHY integration** and enter its API key in the admin
+   settings.
 
-The HomeLab repository's `nextcloud` role does all of this (`nextcloud_talk_stickers`).
+## Using it
+
+**In the browser and the desktop app:** in a Talk conversation, type `/sticker` and press Enter,
+or choose the paperclip, *Smart picker*, *Stickers*. Pick a sticker, then press Enter to send it.
+The picker has a tab per pack, categories, search, and a *Recent* tab for the stickers you sent
+last. The picker also works in other apps with the Smart Picker, such as Text, where it inserts
+the sticker's link.
+
+**In any client, phones included,** send a message that starts with `/sticker`:
+
+| Message                   | Sends                                                         |
+|---------------------------|---------------------------------------------------------------|
+| `/sticker 🎉`             | that emoji's sticker                                          |
+| `/sticker party`          | the sticker whose name or keywords fit best (English words)   |
+| `/sticker twemoji cat`    | a sticker from the pack named first (`fluent`, `noto`, `openmoji`, `twemoji`, or `ours` for your own) |
+| `/sticker`                | a link to the sticker page                                    |
+| `/gif happy dance`        | the first GIF GIPHY finds (words in your language)            |
+
+The message is replaced before it's saved, so nobody sees what you typed. Words that fit no
+sticker are sent as you typed them. `/stickers` and `/gifs` work too, and so do `/giphy` and
+`/naklejka` (Polish).
+
+**On a phone,** you can also open the sticker page, `https://<your cloud>/apps/talk_stickers/`
+(*Stickers* in the app menu), and add it to your home screen. Tap a sticker, then **Share** and
+choose Talk and the conversation, or **Copy link** and paste it into Talk.
+
+**Your own stickers:** put PNG, JPEG, GIF or WebP images in a subfolder of the `Stickers` folder.
+Each subfolder is a pack, for example `Stickers/Dog/Happy.png`.
+
+### Why the first sticker in a conversation can arrive as a link
+
+A sticker sent as a picture is saved in your folder for that conversation, `Talk/<conversation>/
+<you>/`, which Talk shares with the conversation the first time you send any file there. The app
+doesn't create that share itself, because Talk would announce it in the chat. So in a conversation
+where you've never sent a file, stickers and GIFs arrive as links. Send any file once, and from
+then on they arrive as pictures.
+
+## Settings
+
+All settings are optional, set with `occ config:app:set talk_stickers <key> --value <value>`:
+
+| Key            | Default         | Meaning                                                              |
+|----------------|-----------------|----------------------------------------------------------------------|
+| `folder`       | `Stickers`      | The shared folder with your own stickers                             |
+| `packs`        | all             | The packs to build, comma-separated: `fluent`, `noto-animated`, `noto`, `openmoji`, `twemoji`. Run `occ talk_stickers:packs` after changing it |
+| `command_pack` | `noto-animated` | The pack `/sticker` prefers when several stickers fit equally well   |
+
+The rating and language of GIFs come from the GIPHY integration's own settings.
+
+## Troubleshooting
+
+- **The picker shows no packs:** the packs aren't built yet. Check that background jobs run by
+  cron, or run `occ talk_stickers:packs`, which shows each pack as it's done.
+- **Stickers or GIFs arrive as links:** see
+  [above](#why-the-first-sticker-in-a-conversation-can-arrive-as-a-link). Also check that Talk is
+  25 or later, and that Imagick is installed (`php -m | grep imagick`).
+- **`/gif` is sent as typed:** the GIPHY integration is missing or has no API key.
+
+## How it works
+
+The app (`app/talk_stickers/`) is PHP and plain JavaScript, with no build step.
+
+- **Picker:** a custom element of the Smart Picker, `js/talk_stickers.js`. A reference provider,
+  `lib/Reference/StickerReferenceProvider.php`, shows a sticker link
+  (`/apps/talk_stickers/s/<pack>/<id>`) as the sticker.
+- **`/sticker` and `/gif`:** `lib/Listener/StickerCommandListener.php` listens to Talk's
+  `BeforeChatMessageSentEvent`. It finds the sticker (`StickerService::search()`) or the GIF
+  (`GifService`), saves it in the sender's conversation folder, and rewrites the message into
+  Talk's own message of that file, which refers to it by file id, as Talk 25's attachments do.
+  WebP and SVG stickers are converted with Imagick; the results are kept in the app data.
+- **Packs:** `lib/Packs/Builder.php` builds them into the app data from the sources pinned in
+  `lib/Packs/manifest.json`. Archives are checked against their SHA-256, and Unicode's emoji list
+  supplies names and categories. Noto's images come from Google's emoji CDN, which has no pinned
+  versions. Skin-tone variants are left out. A build goes into a new folder, which is used only
+  once it's complete.
+- **Images:** `/apps/talk_stickers/img/<pack>/<file>` serves the packs' images, public and
+  cached, because the phone apps load previews without a login.
 
 ## Developing
 
 ```bash
-cd packs && python3 -m unittest -v test_build              # the builder, without network
-python3 packs/build.py --out /tmp/packs/packs --limit 25   # a small build of every pack
+composer install && vendor/bin/phpunit
 ```
 
-CI (`.forgejo/workflows/ci.yml`) lints the PHP and JavaScript and runs these tests. A release is a
-tag `vX.Y.Z` with the same version in `appinfo/info.xml`.
+The tests need neither Nextcloud nor network. CI (`.forgejo/workflows/ci.yml`) lints the PHP and
+JavaScript, checks `appinfo/info.xml` against the app store's schema and runs the tests.
+
+To release, tag `vX.Y.Z` with the same version as in `appinfo/info.xml`. The release workflow
+(`.forgejo/workflows/release.yml`) then:
+
+1. builds `talk_stickers-X.Y.Z.tar.gz`;
+2. signs it with the app store key (secret `APP_SIGNING_KEY`);
+3. attaches it to the release;
+4. publishes it on the app store (secret `APPSTORE_TOKEN`).
 
 ## Licence
 
-The app is licensed under the [AGPL-3.0-or-later](LICENSE). The packs keep their own licences
-([NOTICE.md](NOTICE.md)).
+The app is licensed under the [AGPL-3.0-or-later](LICENSE). The sticker packs keep their own
+licences; see [NOTICE.md](NOTICE.md). The picker shows each pack's attribution.

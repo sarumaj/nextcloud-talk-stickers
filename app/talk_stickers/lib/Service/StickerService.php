@@ -7,19 +7,20 @@ declare(strict_types=1);
 namespace OCA\TalkStickers\Service;
 
 use OCA\TalkStickers\AppInfo\Application;
-use OCP\App\IAppManager;
 use OCP\Files\File;
 use OCP\Files\Folder;
 use OCP\Files\AppData\IAppDataFactory;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
+use OCP\Files\SimpleFS\ISimpleFile;
+use OCP\Files\SimpleFS\ISimpleFolder;
 use OCP\IAppConfig;
 use OCP\IURLGenerator;
 
 /**
- * The stickers: the shipped packs (packs/index.json beside the app, built by
- * packs/build.py of the repository) and the family's own, images in subfolders
+ * The stickers: the shipped packs (built into the app data by Packs\Builder,
+ * occ talk_stickers:packs) and the family's own, images in subfolders
  * of a shared folder ("Stickers" unless the app setting "folder" says
  * otherwise), one pack per subfolder.
  */
@@ -34,7 +35,6 @@ class StickerService {
 	private ?array $index = null;
 
 	public function __construct(
-		private IAppManager $appManager,
 		private IAppConfig $appConfig,
 		private IRootFolder $rootFolder,
 		private IURLGenerator $urlGenerator,
@@ -220,13 +220,13 @@ class StickerService {
 				return $cached;
 			}
 			$sticker = $this->shippedSticker($pack, $id);
-			$path = $sticker === null ? '' : $this->appManager->getAppPath(Application::APP_ID) . '/packs/' . $pack . '/' . $sticker['f'];
-			if ($path === '' || !is_file($path)) {
+			$file = $sticker === null ? null : $this->shippedFile($pack, $sticker['f']);
+			if ($file === null) {
 				return null;
 			}
 			$name = $sticker['n'];
-			$data = (string)file_get_contents($path);
-			$mime = ['png' => 'image/png', 'gif' => 'image/gif', 'webp' => 'image/webp', 'svg' => 'image/svg+xml'][pathinfo($path, PATHINFO_EXTENSION)] ?? '';
+			$data = $file->getContent();
+			$mime = ['png' => 'image/png', 'gif' => 'image/gif', 'webp' => 'image/webp', 'svg' => 'image/svg+xml'][pathinfo($sticker['f'], PATHINFO_EXTENSION)] ?? '';
 		}
 		if ($mime === 'image/png' || $mime === 'image/jpeg' || $mime === 'image/gif') {
 			return ['name' => $name, 'data' => $data, 'mime' => $mime];
@@ -344,17 +344,47 @@ class StickerService {
 		return $node instanceof File && in_array($node->getMimetype(), self::IMAGE_TYPES, true) ? $node : null;
 	}
 
+	/** The shipped packs' index.json (Packs\\Builder), or [] before they are built. */
 	private function shipped(): array {
 		if ($this->index === null) {
-			$path = $this->appManager->getAppPath(Application::APP_ID) . '/packs/index.json';
-			$data = is_file($path) ? json_decode((string)file_get_contents($path), true) : null;
+			$folder = $this->packsFolder();
+			try {
+				$data = $folder === null ? null : json_decode($folder->getFile('index.json')->getContent(), true);
+			} catch (NotFoundException) {
+				$data = null;
+			}
 			$this->index = is_array($data) ? $data : [];
 		}
 		return $this->index;
 	}
 
+	/** A shipped sticker's image file, or null. */
+	public function shippedFile(string $pack, string $file): ?ISimpleFile {
+		$folder = $this->packsFolder();
+		try {
+			return $folder?->getFolder($pack)->getFile($file);
+		} catch (NotFoundException) {
+			return null;
+		}
+	}
+
+	/** The app data's folder of the packs in use (app setting packs_folder), or null. */
+	private function packsFolder(): ?ISimpleFolder {
+		$name = $this->appConfig->getValueString(Application::APP_ID, 'packs_folder', '');
+		if ($name === '') {
+			return null;
+		}
+		try {
+			return $this->appDataFactory->get(Application::APP_ID)->getFolder($name);
+		} catch (NotFoundException) {
+			return null;
+		}
+	}
+
 	private function shippedBase(): string {
-		return $this->urlGenerator->getAbsoluteURL($this->appManager->getAppWebPath(Application::APP_ID) . '/packs/');
+		// The image route's URL without its pack and file, which the picker appends.
+		$url = $this->urlGenerator->linkToRouteAbsolute(Application::APP_ID . '.sticker.image', ['pack' => 'p', 'file' => 'f.png']);
+		return substr($url, 0, -strlen('p/f.png'));
 	}
 
 	private function folderName(): string {

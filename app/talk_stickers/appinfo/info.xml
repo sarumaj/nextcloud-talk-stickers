@@ -3,11 +3,18 @@
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>talk_stickers</id>
     <name>Talk stickers</name>
-    <summary>Stickers for Talk: from the Smart Picker, or shared from your phone</summary>
-    <description><![CDATA[Send stickers in Talk (and wherever the Smart Picker is offered): open-licensed emoji packs (Fluent Emoji, Noto Emoji, also animated, OpenMoji, Twemoji) and your own, uploaded as images to a shared folder.
+    <summary>Stickers and GIFs in Talk, also from the phone apps</summary>
+    <description><![CDATA[Send stickers and GIFs in Nextcloud Talk, from the browser, the desktop app and the Talk apps for Android and iOS.
 
-A sticker is sent as a link, which Talk shows as the image. On phones, whose Talk apps have no Smart Picker, the app's own page (to add to the home screen) shares a sticker to Talk as an image, and a message "/sticker party" (or an emoji) becomes the sticker in every Talk client. With the GIPHY integration, "/gif <words>" sends a GIF the same way.]]></description>
-    <version>1.5.0</version>
+- **About 8,400 stickers** in five open-licensed packs (Fluent Emoji 3D, Noto Emoji animated and still, OpenMoji, Twemoji), downloaded by your server after installation
+- **Your own stickers**: images in a shared folder, one pack per subfolder
+- **Stickers arrive as pictures**, animated ones moving, without link text
+- **/sticker party** or **/sticker 🎉** sends a sticker from any Talk client, phones included
+- **/gif happy dance** sends a GIF from GIPHY (with the GIPHY integration)
+- **A sticker page for phones**, to add to the home screen and share stickers to Talk
+
+After installation a background job downloads the packs (about 300 MB, a few minutes; or run `occ talk_stickers:packs`). Stickers and GIFs are sent as pictures with Talk 25 or later.]]></description>
+    <version>1.6.0</version>
     <licence>agpl</licence>
     <author>Dawid Ciepiela</author>
     <namespace>TalkStickers</namespace>
@@ -15,6 +22,22 @@ A sticker is sent as a link, which Talk shows as the image. On phones, whose Tal
     <website>https://git.ciepiela.org/dawid/nextcloud-talk-stickers</website>
     <bugs>https://git.ciepiela.org/dawid/nextcloud-talk-stickers/issues</bugs>
     <repository>https://git.ciepiela.org/dawid/nextcloud-talk-stickers</repository>
+    <dependencies>
+        <php min-version="8.1"/>
+        <lib>zip</lib>
+        <nextcloud min-version="32" max-version="36"/>
+    </dependencies>
+    <repair-steps>
+        <post-migration>
+            <step>OCA\TalkStickers\Migration\QueuePacks</step>
+        </post-migration>
+        <install>
+            <step>OCA\TalkStickers\Migration\QueuePacks</step>
+        </install>
+    </repair-steps>
+    <commands>
+        <command>OCA\TalkStickers\Command\Packs</command>
+    </commands>
     <navigations>
         <navigation>
             <name>Stickers</name>
@@ -22,7 +45,4 @@ A sticker is sent as a link, which Talk shows as the image. On phones, whose Tal
             <icon>app.svg</icon>
         </navigation>
     </navigations>
-    <dependencies>
-        <nextcloud min-version="32" max-version="36"/>
-    </dependencies>
 </info>

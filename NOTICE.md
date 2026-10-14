@@ -1,8 +1,8 @@
 # Licences of the sticker packs
 
-The packs are not part of this repository: `packs/build.py` downloads them from their sources
-(`packs/manifest.json`). They keep the licences below, and the picker shows each pack's attribution
-with a link to its licence.
+The packs are not part of this app: the server downloads them from their sources after
+installation (`app/talk_stickers/lib/Packs/manifest.json`). They keep the licences below, and the
+picker shows each pack's attribution with a link to its licence.
 
 | Pack                  | Source                                                                      | Licence                                                             | Attribution                                                                          |
 |-----------------------|-----------------------------------------------------------------------------|---------------------------------------------------------------------|--------------------------------------------------------------------------------------|
@@ -12,5 +12,6 @@ with a link to its licence.
 | OpenMoji              | [openmoji.org](https://openmoji.org/)                                       | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)     | All emojis designed by OpenMoji – the open-source emoji and icon project             |
 | Twemoji               | [jdecked/twemoji](https://github.com/jdecked/twemoji)                       | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)           | Twemoji © Twitter, Inc and other contributors                                        |
 
-The packs are used unchanged: only the images are selected (skin-tone variants are left out) and
-renamed after their emoji's code points.
+The images are selected (skin-tone variants are left out) and renamed after their emoji's code
+points. When a sticker is sent in Talk, WebP and SVG images are converted to GIF or PNG and scaled
+to at most 256 pixels.

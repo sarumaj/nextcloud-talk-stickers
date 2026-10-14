@@ -1,6 +1,6 @@
 ---
-# The app's PHP and JavaScript must at least parse; the pack builder's tests run
-# without network. The packs themselves are built on the server (README).
+# The app's PHP and JavaScript must parse, its info.xml must pass the app
+# store's schema, and the tests (PHPUnit, no Nextcloud and no network) must pass.
 name: CI
 "on":
   push:
@@ -16,12 +16,11 @@ concurrency:
 jobs:
   php:
     runs-on: docker
-    container: docker.io/library/php:8.4-cli
-    timeout-minutes: 10
+    container: docker.io/library/composer:2
+    timeout-minutes: 15
     steps:
       - name: Check out
         run: &checkout |
-          apt-get update -qq && apt-get install -qq -y git >/dev/null
           git init -q . && git remote add origin "${{ github.server_url }}/${{ github.repository }}.git"
           git fetch -q --depth 1 origin "${{ github.sha }}"
           git checkout -q FETCH_HEAD
@@ -29,24 +28,27 @@ jobs:
       - name: Lint the PHP files
         run: find app -name '*.php' -print0 | xargs -0 -n1 php -l
 
-  javascript-and-packs:
+      - name: Check info.xml against the app store's schema
+        run: |
+          apk add -q libxml2-utils
+          wget -q -O /tmp/info.xsd https://apps.nextcloud.com/schema/apps/info.xsd
+          xmllint --noout --schema /tmp/info.xsd app/talk_stickers/appinfo/info.xml
+
+      - name: Run the tests
+        run: |
+          composer install -q --no-interaction --no-progress
+          vendor/bin/phpunit
+
+  javascript:
     runs-on: docker
     container: docker.io/library/node:24-bookworm
     timeout-minutes: 10
     steps:
       - name: Check out
-        run: |
-          git init -q . && git remote add origin "${{ github.server_url }}/${{ github.repository }}.git"
-          git fetch -q --depth 1 origin "${{ github.sha }}"
-          git checkout -q FETCH_HEAD
+        run: *checkout
 
       - name: Check the JavaScript parses
         run: for f in app/talk_stickers/js/*.js app/talk_stickers/l10n/*.js; do node --check "$f"; done
 
       - name: Check the translations are valid JSON
         run: for f in app/talk_stickers/l10n/*.json; do node -e "JSON.parse(require('fs').readFileSync('$f'))"; done
-
-      - name: Test the pack builder
-        run: |
-          apt-get update -qq && apt-get install -qq -y python3 >/dev/null
-          cd packs && python3 -m unittest -v test_build

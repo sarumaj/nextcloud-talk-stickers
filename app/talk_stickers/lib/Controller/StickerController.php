@@ -11,6 +11,7 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\FileDisplayResponse;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Http\NotFoundResponse;
@@ -35,7 +36,31 @@ class StickerController extends Controller {
 	}
 
 	/**
-	 * A sent sticker: a shipped one redirects to its static image, one of the
+	 * A shipped sticker's image, to everyone: the packs are open-licensed, and the
+	 * phone apps load a sent sticker's preview without a login. Never changes
+	 * under its URL (a new build has new ids only where Unicode has new emoji).
+	 */
+	#[PublicPage]
+	#[NoCSRFRequired]
+	public function image(string $pack, string $file): Response {
+		$image = $this->stickers->shippedFile($pack, $file);
+		if ($image === null) {
+			return new NotFoundResponse();
+		}
+		$extension = pathinfo($file, PATHINFO_EXTENSION);
+		$response = new FileDisplayResponse($image, Http::STATUS_OK, [
+			'Content-Type' => ['png' => 'image/png', 'webp' => 'image/webp', 'svg' => 'image/svg+xml'][$extension],
+			'Content-Disposition' => 'inline',
+			'X-Content-Type-Options' => 'nosniff',
+			// SVGs are checked when the packs are built; this keeps one from doing anything anyway.
+			'Content-Security-Policy' => "default-src 'none'; style-src 'unsafe-inline'",
+		]);
+		$response->cacheFor(30 * 24 * 3600, true, true);
+		return $response;
+	}
+
+	/**
+	 * A sent sticker: a shipped one redirects to its image, one of the
 	 * shared folder is streamed to those who can read that folder.
 	 */
 	#[NoAdminRequired]

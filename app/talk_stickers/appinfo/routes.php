@@ -14,5 +14,8 @@ return [
 		// A sent sticker: the link in the message, and its image.
 		['name' => 'sticker#show', 'url' => '/s/{pack}/{id}', 'verb' => 'GET',
 			'requirements' => ['pack' => '[a-z0-9-]+', 'id' => '[A-Za-z0-9-]+']],
+		// The shipped packs' images (built into the app data, served from there).
+		['name' => 'sticker#image', 'url' => '/img/{pack}/{file}', 'verb' => 'GET',
+			'requirements' => ['pack' => '[a-z0-9-]+', 'file' => '[A-Za-z0-9-]+\\.(?:png|webp|svg)']],
 	],
 ];
