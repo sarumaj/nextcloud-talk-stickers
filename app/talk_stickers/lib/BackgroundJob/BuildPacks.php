@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace OCA\TalkStickers\BackgroundJob;
 
 use OCA\TalkStickers\Packs\Builder;
+use OCA\TalkStickers\Packs\BuildRunningException;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\QueuedJob;
 use Psr\Log\LoggerInterface;
@@ -31,6 +32,8 @@ class BuildPacks extends QueuedJob {
 		}
 		try {
 			$this->builder->build(null, null, fn (string $line) => $this->logger->info('Sticker packs: ' . $line));
+		} catch (BuildRunningException) {
+			// occ talk_stickers:packs is building them.
 		} catch (\Throwable $e) {
 			$this->logger->error('The sticker packs could not be built; occ talk_stickers:packs tries again', ['exception' => $e]);
 		}

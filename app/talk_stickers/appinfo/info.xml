@@ -14,13 +14,13 @@
 - **A sticker page for phones**, to add to the home screen and share stickers to Talk
 
 After installation a background job downloads the packs (about 300 MB, a few minutes; or run `occ talk_stickers:packs`). Stickers and GIFs are sent as pictures with Talk 25 or later.]]></description>
-    <version>1.6.0</version>
+    <version>1.6.1</version>
     <licence>agpl</licence>
     <author>Dawid Ciepiela</author>
     <namespace>TalkStickers</namespace>
     <category>social</category>
     <website>https://git.ciepiela.org/dawid/nextcloud-talk-stickers</website>
-    <bugs>https://git.ciepiela.org/dawid/nextcloud-talk-stickers/issues</bugs>
+    <bugs>https://github.com/sarumaj/nextcloud-talk-stickers/issues</bugs>
     <repository>https://git.ciepiela.org/dawid/nextcloud-talk-stickers</repository>
     <dependencies>
         <php min-version="8.1"/>

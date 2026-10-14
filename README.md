@@ -120,6 +120,12 @@ The app (`app/talk_stickers/`) is PHP and plain JavaScript, with no build step.
 - **Images:** `/apps/talk_stickers/img/<pack>/<file>` serves the packs' images, public and
   cached, because the phone apps load previews without a login.
 
+## Reporting problems
+
+Please open an issue on GitHub:
+[sarumaj/nextcloud-talk-stickers](https://github.com/sarumaj/nextcloud-talk-stickers/issues). Say
+which versions of Nextcloud, Talk and this app you use, and which Talk client.
+
 ## Developing
 
 ```bash
@@ -127,7 +133,9 @@ composer install && vendor/bin/phpunit
 ```
 
 The tests need neither Nextcloud nor network. CI (`.forgejo/workflows/ci.yml`) lints the PHP and
-JavaScript, checks `appinfo/info.xml` against the app store's schema and runs the tests.
+JavaScript, checks `appinfo/info.xml` against the app store's schema and runs the tests. The code
+lives at [git.ciepiela.org](https://git.ciepiela.org/dawid/nextcloud-talk-stickers); GitHub has a
+copy, where the issues are.
 
 To release, tag `vX.Y.Z` with the same version as in `appinfo/info.xml`. The release workflow
 (`.forgejo/workflows/release.yml`) then:

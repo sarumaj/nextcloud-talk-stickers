@@ -11,6 +11,8 @@ use OCP\Files\AppData\IAppDataFactory;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
 use OCP\ITempManager;
+use OCP\Lock\ILockingProvider;
+use OCP\Lock\LockedException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -19,6 +21,8 @@ use Psr\Log\LoggerInterface;
  * and packs-<time>/index.json, the catalogue the picker gets. Archives are
  * checked against their pinned SHA-256. The app setting "packs_folder" names the complete build in use;
  * it changes only once a new build is complete, and the old one is removed then.
+ * One build at a time: a second one (the background job while occ builds) would
+ * remove the first one's folder when it finishes, and the first the second's.
  * Skin-tone variants are left out: the picker shows each emoji once.
  */
 class Builder {
@@ -27,6 +31,8 @@ class Builder {
 	private const OPENMOJI_GROUPS = ['extras-openmoji' => 'OpenMoji extras', 'extras-unicode' => 'More symbols'];
 	/** Parallel downloads from the emoji CDN. */
 	private const WORKERS = 8;
+	/** The lock of a build (Nextcloud's locking provider, released at the end). */
+	private const LOCK = 'talk_stickers/packs-build';
 
 	/** @var callable(string): void */
 	private $report;
@@ -37,6 +43,7 @@ class Builder {
 		private IClientService $clientService,
 		private ITempManager $tempManager,
 		private LoggerInterface $logger,
+		private ILockingProvider $locking,
 	) {
 		$this->report = fn (string $line) => null;
 	}
@@ -75,6 +82,19 @@ class Builder {
 		if ($report !== null) {
 			$this->report = $report;
 		}
+		try {
+			$this->locking->acquireLock(self::LOCK, ILockingProvider::LOCK_EXCLUSIVE, 'the sticker packs');
+		} catch (LockedException) {
+			throw new BuildRunningException('The sticker packs are being built already; try again when that build is done.');
+		}
+		try {
+			$this->buildLocked($only, $limit);
+		} finally {
+			$this->locking->releaseLock(self::LOCK, ILockingProvider::LOCK_EXCLUSIVE);
+		}
+	}
+
+	private function buildLocked(?array $only, ?int $limit): void {
 		$appData = $this->appDataFactory->get(Application::APP_ID);
 		$name = 'packs-' . gmdate('YmdHis');
 		$out = $appData->newFolder($name);
