@@ -224,6 +224,8 @@
 					: el('p', { class: 'talk-stickers__note', text: t('No stickers found') }))
 			}
 			grid.replaceChildren(...cells)
+			// The chosen pack in view, also when the row scrolls sideways on a phone.
+			tabBar.querySelector('.talk-stickers__tab--active')?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
 			footer.replaceChildren(...(tab.attribution
 				? [el('a', { href: tab.licenseUrl, target: '_blank', rel: 'noopener noreferrer', text: tab.attribution })]
 				: []))

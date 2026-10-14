@@ -194,3 +194,152 @@
 	text-align: center;
 	word-break: break-all;
 }
+
+/* The rows that scroll sideways fade out at the edge, so that they show there is more. */
+.talk-stickers__tabs,
+.talk-stickers__categories {
+	scrollbar-width: none;
+	mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+}
+
+.talk-stickers__tabs::-webkit-scrollbar,
+.talk-stickers__categories::-webkit-scrollbar {
+	display: none;
+}
+
+/* Categories below the packs: lighter, so that the two rows read apart. */
+.talk-stickers__category {
+	border-color: transparent;
+	background-color: var(--color-background-dark);
+	font-weight: normal;
+}
+
+/* Touch: no hover that stays after a tap, a press that shows instead. */
+@media (hover: none) {
+	.talk-stickers__sticker:hover {
+		background-color: transparent;
+	}
+
+	.talk-stickers__sticker:active {
+		background-color: var(--color-background-hover);
+		transform: scale(0.92);
+	}
+}
+
+.talk-stickers__footer a {
+	color: inherit;
+}
+
+.talk-stickers__footer {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.talk-stickers-sheet__panel {
+	max-height: 100%;
+	overflow-y: auto;
+	animation: talk-stickers-rise 0.18s ease-out;
+}
+
+@keyframes talk-stickers-rise {
+	from {
+		transform: translateY(40px);
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.talk-stickers-sheet__panel {
+		animation: none;
+	}
+}
+
+/* Phones: more stickers to a row, less above them, buttons for thumbs. */
+@media (max-width: 600px) {
+	.talk-stickers {
+		gap: 6px;
+		padding: 6px;
+		min-height: 0;
+	}
+
+	.talk-stickers__search {
+		min-height: 40px;
+	}
+
+	.talk-stickers__tab {
+		min-height: 36px;
+		padding: 2px 14px;
+	}
+
+	.talk-stickers__category {
+		min-height: 32px;
+		padding: 2px 12px;
+	}
+
+	.talk-stickers__grid {
+		grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+		gap: 2px;
+	}
+
+	.talk-stickers__sticker {
+		height: 64px;
+		padding: 2px;
+	}
+
+	.talk-stickers__sticker img {
+		max-width: 52px;
+		max-height: 52px;
+	}
+
+	.talk-stickers-page__tip {
+		margin: 6px 6px 0;
+		font-size: 0.9em;
+	}
+
+	.talk-stickers-sheet__panel {
+		max-width: none;
+	}
+
+	.talk-stickers-sheet__actions {
+		width: 100%;
+	}
+
+	.talk-stickers-sheet__actions button {
+		flex: 1 1 0;
+		margin: 0;
+		padding: 0 8px;
+	}
+}
+
+/* Low screens (a phone held sideways): the sticker beside its buttons. */
+@media (max-height: 480px) {
+	.talk-stickers-sheet__panel {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		grid-template-areas: 'image name' 'image actions' 'image status';
+		align-items: center;
+		column-gap: 16px;
+		max-width: 640px;
+	}
+
+	.talk-stickers-sheet__image {
+		grid-area: image;
+		width: 120px;
+		height: 120px;
+	}
+
+	.talk-stickers-sheet__name {
+		grid-area: name;
+		margin: 0;
+	}
+
+	.talk-stickers-sheet__actions {
+		grid-area: actions;
+	}
+
+	.talk-stickers-sheet__status {
+		grid-area: status;
+		margin: 0;
+	}
+}
