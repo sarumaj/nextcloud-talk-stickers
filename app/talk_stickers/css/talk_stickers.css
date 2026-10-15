@@ -115,6 +115,14 @@
 }
 
 /* The page for phones: the picker fills the content area. */
+/* The page's own background, as other apps': without it the themed background
+   (the user's colour or image) shows behind the gray hints. */
+.talk-stickers-content {
+	background-color: var(--color-main-background);
+	color: var(--color-main-text);
+	overflow-y: auto;
+}
+
 .talk-stickers-page {
 	display: flex;
 	flex-direction: column;
