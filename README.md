@@ -52,13 +52,13 @@ the sticker's link.
 
 **In any client, phones included,** send a message that starts with `/sticker`:
 
-| Message                   | Sends                                                         |
-|---------------------------|---------------------------------------------------------------|
-| `/sticker 🎉`             | that emoji's sticker                                          |
-| `/sticker party`          | the sticker whose name or keywords fit best (English words)   |
-| `/sticker twemoji cat`    | a sticker from the pack named first (`fluent`, `noto`, `openmoji`, `twemoji`, or `ours` for your own) |
-| `/sticker`                | a link to the sticker page                                    |
-| `/gif happy dance`        | the first GIF GIPHY finds (words in your language)            |
+| Message                | Sends                                                                                                 |
+| ---------------------- | ----------------------------------------------------------------------------------------------------- |
+| `/sticker 🎉`          | that emoji's sticker                                                                                  |
+| `/sticker party`       | the sticker whose name or keywords fit best (English words)                                           |
+| `/sticker twemoji cat` | a sticker from the pack named first (`fluent`, `noto`, `openmoji`, `twemoji`, or `ours` for your own) |
+| `/sticker`             | a link to the sticker page                                                                            |
+| `/gif happy dance`     | the first GIF GIPHY finds (words in your language)                                                    |
 
 The message is replaced before it's saved, so nobody sees what you typed. Words that fit no
 sticker are sent as you typed them. `/stickers` and `/gifs` work too, and so do `/giphy` and
@@ -83,11 +83,11 @@ Stickers count against your storage quota, a few hundred kilobytes each at most.
 
 All settings are optional, set with `occ config:app:set talk_stickers <key> --value <value>`:
 
-| Key            | Default         | Meaning                                                              |
-|----------------|-----------------|----------------------------------------------------------------------|
-| `folder`       | `Stickers`      | The shared folder with your own stickers                             |
+| Key            | Default         | Meaning                                                                                                                                        |
+| -------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `folder`       | `Stickers`      | The shared folder with your own stickers                                                                                                       |
 | `packs`        | all             | The packs to build, comma-separated: `fluent`, `noto-animated`, `noto`, `openmoji`, `twemoji`. Run `occ talk_stickers:packs` after changing it |
-| `command_pack` | `noto-animated` | The pack `/sticker` prefers when several stickers fit equally well   |
+| `command_pack` | `noto-animated` | The pack `/sticker` prefers when several stickers fit equally well                                                                             |
 
 The rating and language of GIFs come from the GIPHY integration's own settings.
 
