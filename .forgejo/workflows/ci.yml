@@ -2,6 +2,9 @@
 # The app's PHP and JavaScript must parse, its info.xml must pass the app
 # store's schema, and the tests (PHPUnit, no Nextcloud and no network) must pass.
 name: CI
+# A failed job mails whoever started the run. Renovate's bot has no mailbox: when its
+# branch fails, Renovate opens a pull request, which mails the repository's watchers.
+enable-email-notifications: true
 "on":
   push:
     branches: [main, renovate/all-patch]
