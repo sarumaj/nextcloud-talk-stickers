@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- `info.xml` asks for PHP 8.2, as `composer.json` does.
+
 ## 1.6.3 - 2026-10-15
 
 ### Fixed

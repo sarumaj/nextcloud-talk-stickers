@@ -18,8 +18,8 @@ browser, the desktop app and the Talk apps for Android and iOS.
 
 - Nextcloud 32 to 36 with Talk. Talk 25 or later sends stickers and GIFs as pictures; older
   versions send them as links.
-- PHP with the `zip` extension. Imagick (with SVG and WebP support) converts animated stickers to
-  GIF, which Talk animates; without it, those stickers are sent as links.
+- PHP 8.2 or later with the `zip` extension. Imagick (with SVG and WebP support) converts
+  animated stickers to GIF, which Talk animates; without it, those stickers are sent as links.
 - Background jobs run by cron, as Nextcloud recommends. The sticker packs are built by a
   background job.
 - About 600 MB of disk space in the app data for the packs. The server needs to reach GitHub,

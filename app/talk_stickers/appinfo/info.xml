@@ -23,7 +23,7 @@ After installation a background job downloads the packs (about 300 MB, a few min
     <bugs>https://github.com/sarumaj/nextcloud-talk-stickers/issues</bugs>
     <repository>https://git.ciepiela.org/dawid/nextcloud-talk-stickers</repository>
     <dependencies>
-        <php min-version="8.1"/>
+        <php min-version="8.2"/>
         <lib>zip</lib>
         <nextcloud min-version="32" max-version="36"/>
     </dependencies>
