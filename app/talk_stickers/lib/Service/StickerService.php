@@ -7,9 +7,9 @@ declare(strict_types=1);
 namespace OCA\TalkStickers\Service;
 
 use OCA\TalkStickers\AppInfo\Application;
+use OCP\Files\AppData\IAppDataFactory;
 use OCP\Files\File;
 use OCP\Files\Folder;
-use OCP\Files\AppData\IAppDataFactory;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
