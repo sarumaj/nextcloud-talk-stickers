@@ -14,6 +14,13 @@ browser, the desktop app and the Talk apps for Android and iOS.
 - **A sticker page for phones:** you can add it to your home screen and share a sticker to Talk
   through the phone's share sheet.
 
+## Screenshots
+
+|                                                                        |                                                                    |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| ![The sticker picker in a Talk conversation](screenshots/1-picker.png) | ![Stickers sent in a conversation](screenshots/2-conversation.png) |
+| ![Searching a pack](screenshots/3-search.png)                          | ![The sticker page for phones](screenshots/4-sticker-page.png)     |
+
 ## Requirements
 
 - Nextcloud 32 to 36 with Talk. Talk 25 or later sends stickers and GIFs as pictures; older

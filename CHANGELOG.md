@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- Screenshots in the README and on the app store.
+
 ### Changed
 
 - The README follows the order of the other apps; settings and troubleshooting moved to
