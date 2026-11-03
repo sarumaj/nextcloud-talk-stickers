@@ -42,6 +42,8 @@ browser, the desktop app and the Talk apps for Android and iOS.
 4. Optional, for GIFs: install the **GIPHY integration** and enter its API key in the admin
    settings.
 
+The settings and troubleshooting are in [docs/admin.md](docs/admin.md).
+
 ## Using it
 
 **In the browser and the desktop app:** in a Talk conversation, type `/sticker` and press Enter,
@@ -71,33 +73,7 @@ choose Talk and the conversation, or **Copy link** and paste it into Talk.
 **Your own stickers:** put PNG, JPEG, GIF or WebP images in a subfolder of the `Stickers` folder.
 Each subfolder is a pack, for example `Stickers/Dog/Happy.png`.
 
-### Where sent stickers are kept
-
-A sticker or GIF sent as a picture is saved in your folder for that conversation,
-`Talk/<conversation>/<you>/`, the folder Talk uses for your attachments there; a sticker you send
-again reuses its file. If the folder doesn't exist yet, the app creates it and shares it with the
-conversation, as Talk does for your first attachment, but without Talk's "shared a folder" message.
-Stickers count against your storage quota, a few hundred kilobytes each at most.
-
-## Settings
-
-All settings are optional, set with `occ config:app:set talk_stickers <key> --value <value>`:
-
-| Key            | Default         | Meaning                                                                                                                                        |
-| -------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `folder`       | `Stickers`      | The shared folder with your own stickers                                                                                                       |
-| `packs`        | all             | The packs to build, comma-separated: `fluent`, `noto-animated`, `noto`, `openmoji`, `twemoji`. Run `occ talk_stickers:packs` after changing it |
-| `command_pack` | `noto-animated` | The pack `/sticker` prefers when several stickers fit equally well                                                                             |
-
-The rating and language of GIFs come from the GIPHY integration's own settings.
-
-## Troubleshooting
-
-- **The picker shows no packs:** the packs aren't built yet. Check that background jobs run by
-  cron, or run `occ talk_stickers:packs`, which shows each pack as it's done.
-- **Stickers or GIFs arrive as links:** the sender has no free storage quota, Talk is older than
-  25, or Imagick is missing (`php -m | grep imagick`). The server log says which.
-- **`/gif` is sent as typed:** the GIPHY integration is missing or has no API key.
+Where sent stickers are kept, and more on your own stickers: [docs/user.md](docs/user.md).
 
 ## How it works
 
@@ -121,30 +97,27 @@ The app (`app/talk_stickers/`) is PHP and plain JavaScript, with no build step.
 - **Images:** `/apps/talk_stickers/img/<pack>/<file>` serves the packs' images, public and
   cached, because the phone apps load previews without a login.
 
-## Reporting problems
-
-Please open an issue on GitHub:
-[sarumaj/nextcloud-talk-stickers](https://github.com/sarumaj/nextcloud-talk-stickers/issues). Say
-which versions of Nextcloud, Talk and this app you use, and which Talk client.
-
 ## Developing
 
 ```bash
-composer install && vendor/bin/phpunit
+composer install
+vendor/bin/phpunit && node tests/l10n.js
+composer cs:check && composer psalm
+npx --yes markdownlint-cli2 "*.md" "docs/**/*.md"
 ```
 
-The tests need neither Nextcloud nor network. CI (`.forgejo/workflows/ci.yml`) lints the PHP and
-JavaScript, checks `appinfo/info.xml` against the app store's schema and runs the tests. The code
-lives at [git.ciepiela.org](https://git.ciepiela.org/dawid/nextcloud-talk-stickers); GitHub has a
-copy, where the issues are.
+The tests need neither Nextcloud nor network. CI (`.forgejo/workflows/ci.yml`) also lints the PHP
+and JavaScript and checks `appinfo/info.xml` against the app store's schema. The layout, the
+checks and releasing are in [docs/developer.md](docs/developer.md). The code lives at
+[git.ciepiela.org](https://git.ciepiela.org/dawid/nextcloud-talk-stickers); GitHub has a copy.
 
-To release, tag `vX.Y.Z` with the same version as in `appinfo/info.xml`. The release workflow
-(`.forgejo/workflows/release.yml`) then:
+## Reporting problems
 
-1. builds `talk_stickers-X.Y.Z.tar.gz`;
-2. signs it with the app store key (secret `APP_SIGNING_KEY`);
-3. attaches it to the release;
-4. publishes it on the app store (secret `APPSTORE_TOKEN`).
+Please open an issue on GitHub,
+[sarumaj/nextcloud-talk-stickers](https://github.com/sarumaj/nextcloud-talk-stickers/issues), or
+on [git.ciepiela.org](https://git.ciepiela.org/dawid/nextcloud-talk-stickers/issues); both are
+read. Say which versions of Nextcloud, Talk and this app you use, and which Talk client. Security
+problems go privately, as [SECURITY.md](SECURITY.md) says.
 
 ## Licence
 

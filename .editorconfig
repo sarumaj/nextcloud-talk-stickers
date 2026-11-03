@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{py,xml}]
+indent_style = space
+indent_size = 4
+
+[*.{yml,yaml,json}]
+indent_style = space
+indent_size = 2
+
+# PHP, JavaScript and CSS are indented with tabs, as Nextcloud's coding standard
+# (php-cs-fixer) and the app's existing code have them; so are the shell and Java helpers.
+[*.{php,js,mjs,cjs,vue,css,sh,java}]
+indent_style = tab
+indent_size = 4
+
+[*.md]
+trim_trailing_whitespace = false

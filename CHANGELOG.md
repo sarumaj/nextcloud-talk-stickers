@@ -2,16 +2,19 @@
 
 ## [Unreleased]
 
+### Changed
+
+- The README follows the order of the other apps; settings and troubleshooting moved to
+  `docs/admin.md`, the details of sending to `docs/user.md`, layout, checks and releasing to
+  `docs/developer.md`. `AGENTS.md`, `SECURITY.md` and `.editorconfig` are new.
+- `info.xml` asks for PHP 8.2, as `composer.json` does.
+- CI checks the PHP with Nextcloud's coding standard (php-cs-fixer) and Psalm, and the Markdown
+  with markdownlint; it runs on every `renovate/` branch.
+
 ### Fixed
 
 - A sticker sent as a picture is named in German and Polish too ("Sticker", "Naklejka"): the
   translations lacked the word. A test checks that every translation has every string.
-
-### Changed
-
-- `info.xml` asks for PHP 8.2, as `composer.json` does.
-- CI checks the PHP with Nextcloud's coding standard (php-cs-fixer) and Psalm, and the Markdown
-  with markdownlint; it runs on every `renovate/` branch.
 
 ## 1.6.3 - 2026-10-15
 
