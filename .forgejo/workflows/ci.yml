@@ -3,7 +3,8 @@
 #
 # The app's PHP and JavaScript must parse, its info.xml must pass the app store's
 # schema, the PHP must follow Nextcloud's coding standard and pass Psalm, the
-# Markdown must pass markdownlint, and the tests (PHPUnit, no Nextcloud and no network) must pass.
+# translations must cover every string, the Markdown must pass markdownlint, and
+# the tests (PHPUnit, no Nextcloud and no network) must pass.
 name: CI
 # A failed job mails whoever started the run. Renovate's bot has no mailbox: when its
 # branch fails, Renovate opens a pull request, which mails the repository's watchers.
@@ -63,8 +64,8 @@ jobs:
       - name: Check the JavaScript parses
         run: for f in app/talk_stickers/js/*.js app/talk_stickers/l10n/*.js; do node --check "$f"; done
 
-      - name: Check the translations are valid JSON
-        run: for f in app/talk_stickers/l10n/*.json; do node -e "JSON.parse(require('fs').readFileSync('$f'))"; done
+      - name: Check the translations are valid and complete
+        run: node tests/l10n.js
 
       - name: Check the Markdown with markdownlint
         run: npx --yes markdownlint-cli2 "*.md" "docs/**/*.md"

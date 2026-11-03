@@ -3,6 +3,7 @@ OC.L10N.register(
     {
         "Stickers: %s": "Sticker: %s",
         "Stickers": "Sticker",
+        "Sticker": "Sticker",
         "Recent": "Zuletzt",
         "Ours": "Unsere",
         "Search stickers": "Sticker suchen",

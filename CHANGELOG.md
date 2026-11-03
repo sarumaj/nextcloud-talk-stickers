@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- A sticker sent as a picture is named in German and Polish too ("Sticker", "Naklejka"): the
+  translations lacked the word. A test checks that every translation has every string.
+
 ### Changed
 
 - `info.xml` asks for PHP 8.2, as `composer.json` does.
