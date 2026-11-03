@@ -22,15 +22,17 @@ browser, the desktop app and the Talk apps for Android and iOS.
   animated stickers to GIF, which Talk animates; without it, those stickers are sent as links.
 - Background jobs run by cron, as Nextcloud recommends. The sticker packs are built by a
   background job.
-- About 600 MB of disk space in the app data for the packs. The server needs to reach GitHub,
-  unicode.org and fonts.gstatic.com once, to download them.
+- About 420 MB of disk space in the app data for the packs, twice that while they are rebuilt
+  after an update. The server downloads about 550 MB from GitHub, unicode.org and
+  fonts.gstatic.com to build them.
 
 ## Installing
 
 1. Install **Talk stickers** from the app store (*Apps*, *Social & communication*). Or unpack a
    release's `talk_stickers-X.Y.Z.tar.gz` into `custom_apps/` and run
    `occ app:enable talk_stickers`.
-2. Wait for the packs. A background job downloads and builds them; this takes a few minutes.
+2. Wait for the packs. A background job downloads and builds them; this takes a few minutes, up to a
+   quarter of an hour.
    To build them at once instead, run:
 
    ```bash

@@ -13,6 +13,8 @@
 
 ### Fixed
 
+- The sizes of the packs, measured: about 550 MB to download and 420 MB in the app data
+  (`info.xml` said 300 MB, the README 600 MB).
 - A sticker sent as a picture is named in German and Polish too ("Sticker", "Naklejka"): the
   translations lacked the word. A test checks that every translation has every string.
 
