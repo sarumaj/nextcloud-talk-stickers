@@ -34,7 +34,7 @@ npx --yes markdownlint-cli2 "*.md" "docs/**/*.md"
 ## Conventions
 
 - Commit messages: one line, no trailers. A change comes with its README or `docs/` text and an
-  entry under `## [Unreleased]` in `CHANGELOG.md` (Keep a Changelog: `### Added`, `### Changed`,
+  entry under `## Unreleased` in `CHANGELOG.md` (Keep a Changelog: `### Added`, `### Changed`,
   `### Fixed`).
 - Markdown: lines of at most 100 characters (tables excepted), tables aligned.
 - PHP, JavaScript and CSS indented with tabs (`.editorconfig`); PHP formatted by `composer cs:fix`.
@@ -45,7 +45,7 @@ npx --yes markdownlint-cli2 "*.md" "docs/**/*.md"
 
 ## Releasing
 
-1. Move the `## [Unreleased]` entries under `## [X.Y.Z] - YYYY-MM-DD` and set `<version>` in
+1. Move the `## Unreleased` entries under `## X.Y.Z - YYYY-MM-DD` and set `<version>` in
    `appinfo/info.xml` to `X.Y.Z`.
 2. Commit as `release X.Y.Z`.
 3. Tag it, annotated and signed as the earlier tags:
