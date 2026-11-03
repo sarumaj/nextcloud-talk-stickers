@@ -21,6 +21,13 @@
   (`info.xml` said 300 MB, the README 600 MB).
 - A sticker sent as a picture is named in German and Polish too ("Sticker", "Naklejka"): the
   translations lacked the word. A test checks that every translation has every string.
+- A sticker or GIF that was the first file of its sender in a one-to-one conversation showed to
+  the other person as a gray placeholder (with `Directory::__construct()` errors in the log):
+  keeping Talk's "shared a folder" message out also kept files_sharing from mounting the share for
+  the recipient, so it was mounted later under the sender's name of the conversation's folder,
+  which the recipient does not have. The app now asks files_sharing to mount it
+  (`UserShareAccessUpdatedEvent`), and Talk names the folder from the recipient's side, as for
+  its own attachments. Shares mounted before the fix are not moved.
 
 ## 1.6.3 - 2026-10-15
 

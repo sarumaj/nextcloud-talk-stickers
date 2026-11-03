@@ -95,8 +95,9 @@ The app (`app/talk_stickers/`) is PHP and plain JavaScript, with no build step.
   `BeforeChatMessageSentEvent`. It finds the sticker (`StickerService::search()`) or the GIF
   (`GifService`), saves it in the sender's conversation folder (made and shared with Talk's own
   `ConversationFolderService` when missing; `QuietFolderShareListener` keeps Talk from announcing
-  that share), and rewrites the message into
-  Talk's own message of that file, which refers to it by file id, as Talk 25's attachments do.
+  that share and has files_sharing mount it for the recipients, as Talk's attachments are), and
+  rewrites the message into Talk's own message of that file, which refers to it by file id, as
+  Talk 25's attachments do.
   WebP and SVG stickers are converted with Imagick; the results are kept in the app data.
 - **Packs:** `lib/Packs/Builder.php` builds them into the app data from the sources pinned in
   `lib/Packs/manifest.json`. Archives are checked against their SHA-256, and Unicode's emoji list
