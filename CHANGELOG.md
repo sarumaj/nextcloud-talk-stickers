@@ -8,6 +8,8 @@
 
 ### Changed
 
+- Releases through the shared action `nextcloud-app-release` of `dawid/ci-actions`: the release's
+  text is the version's section of this changelog, and a tag without one fails.
 - The README follows the order of the other apps; settings and troubleshooting moved to
   `docs/admin.md`, the details of sending to `docs/user.md`, layout, checks and releasing to
   `docs/developer.md`. `AGENTS.md`, `SECURITY.md` and `.editorconfig` are new.

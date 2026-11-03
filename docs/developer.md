@@ -35,9 +35,11 @@ npx --yes markdownlint-cli2 "*.md" "docs/**/*.md"
    `<version>` in `appinfo/info.xml` to `X.Y.Z`.
 2. Commit as `release X.Y.Z`.
 3. Tag it, annotated and signed as the earlier tags: `git tag -s vX.Y.Z -m "Talk stickers X.Y.Z"`,
-   and push the tag. The release workflow (`.forgejo/workflows/release.yml`) then:
+   and push the tag. The release workflow (`.forgejo/workflows/release.yml`, the shared action
+   `nextcloud-app-release` of `dawid/ci-actions`) then:
 
    1. builds `talk_stickers-X.Y.Z.tar.gz`;
    2. signs it with the app store key (secret `APP_SIGNING_KEY`);
-   3. attaches it to the release;
+   3. attaches it to the release, whose text is the version's section of `CHANGELOG.md` (a tag
+      without one fails before anything is released);
    4. publishes it on the app store (secret `APPSTORE_TOKEN`).
