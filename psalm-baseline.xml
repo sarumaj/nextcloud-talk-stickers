@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="6.20.7@d60ecdbc9e577e67b29f632e3e3847dffd14b7ce">
+  <file src="app/talk_stickers/lib/Listener/StickerCommandListener.php">
+    <InvalidArgument>
+      <code><![CDATA[$gif]]></code>
+    </InvalidArgument>
+  </file>
+  <file src="app/talk_stickers/lib/Packs/Builder.php">
+    <FalsableReturnStatement>
+      <code><![CDATA[$local]]></code>
+    </FalsableReturnStatement>
+    <InvalidArgument>
+      <code><![CDATA[$urls]]></code>
+      <code><![CDATA[$urls]]></code>
+    </InvalidArgument>
+  </file>
+  <file src="app/talk_stickers/lib/Packs/TarReader.php">
+    <InvalidOperand>
+      <code><![CDATA[ceil($size / 512) * 512]]></code>
+    </InvalidOperand>
+  </file>
+  <file src="app/talk_stickers/lib/Service/StickerService.php">
+    <UndefinedClass>
+      <code><![CDATA[\Imagick]]></code>
+      <code><![CDATA[\ImagickException]]></code>
+      <code><![CDATA[\ImagickPixel]]></code>
+    </UndefinedClass>
+  </file>
+</files>

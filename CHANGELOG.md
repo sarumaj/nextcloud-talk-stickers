@@ -5,6 +5,8 @@
 ### Changed
 
 - `info.xml` asks for PHP 8.2, as `composer.json` does.
+- CI checks the PHP with Nextcloud's coding standard (php-cs-fixer) and Psalm, and the Markdown
+  with markdownlint; it runs on every `renovate/` branch.
 
 ## 1.6.3 - 2026-10-15
 
