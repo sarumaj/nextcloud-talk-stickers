@@ -234,7 +234,10 @@
 		loadCatalogue().then((data) => {
 			state.folder = data.folder || state.folder
 			state.tabs = tabsOf(data)
-			state.tab = state.tabs.length ? state.tabs[0].id : null
+			// The first tab with stickers (Recent, Ours, then the packs): an empty "Ours" opens
+			// only when there is nothing else, so a new user sees stickers, not just the hint.
+			const first = state.tabs.find((x) => x.stickers.length > 0) || state.tabs[0]
+			state.tab = first ? first.id : null
 			draw()
 			// Not on phones, where the keyboard would cover the stickers.
 			if (!window.matchMedia('(pointer: coarse)').matches) {

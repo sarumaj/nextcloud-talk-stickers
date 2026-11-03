@@ -58,8 +58,8 @@ The settings and troubleshooting are in [docs/admin.md](docs/admin.md).
 **In the browser and the desktop app:** in a Talk conversation, type `/sticker` and press Enter,
 or choose the paperclip, *Smart picker*, *Stickers*. Pick a sticker, then press Enter to send it.
 The picker has a tab per pack, categories, search, and a *Recent* tab for the stickers you sent
-last. The picker also works in other apps with the Smart Picker, such as Text, where it inserts
-the sticker's link.
+last; it opens on the first tab with stickers. The picker also works in other apps with the
+Smart Picker, such as Text, where it inserts the sticker's link.
 
 **In any client, phones included,** send a message that starts with `/sticker`:
 

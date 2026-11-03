@@ -21,6 +21,8 @@
   (`info.xml` said 300 MB, the README 600 MB).
 - A sticker sent as a picture is named in German and Polish too ("Sticker", "Naklejka"): the
   translations lacked the word. A test checks that every translation has every string.
+- The picker and the sticker page open on the first tab with stickers (*Recent*, *Ours*, then the
+  first pack), no longer on an empty *Ours*, where a new user saw only the hint to add their own.
 - A sticker or GIF that was the first file of its sender in a one-to-one conversation showed to
   the other person as a gray placeholder (with `Directory::__construct()` errors in the log):
   keeping Talk's "shared a folder" message out also kept files_sharing from mounting the share for
