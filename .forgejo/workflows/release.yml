@@ -44,4 +44,6 @@ jobs:
           tag: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
           signing-key: ${{ secrets.APP_SIGNING_KEY }}
+          # Published only when the app store's token is set (empty: the release alone).
+          app-store: ${{ secrets.APPSTORE_TOKEN != '' }}
           app-store-token: ${{ secrets.APPSTORE_TOKEN }}
