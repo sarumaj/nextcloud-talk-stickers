@@ -51,7 +51,9 @@ browser, the desktop app and the Talk apps for Android and iOS.
 4. Optional, for GIFs: install the **GIPHY integration** and enter its API key in the admin
    settings.
 
-The settings and troubleshooting are in [docs/admin.md](docs/admin.md).
+Its settings are under *Administration settings → Additional settings → Talk stickers* (the team
+folder, the packs, the pack `/sticker` prefers); they and the troubleshooting are described in
+[docs/admin.md](docs/admin.md).
 
 ## Using it
 

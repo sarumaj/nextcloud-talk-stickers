@@ -4,7 +4,13 @@ Requirements and installing are in the [README](../README.md#requirements).
 
 ## Settings
 
-All settings are optional, set with `occ config:app:set talk_stickers <key> --value <value>`:
+**Where its settings are:** *Administration settings → Additional settings → Talk stickers*:
+the team folder, the packs to offer and the pack `/sticker` prefers. Each change is saved as it
+is made (there is no Save button); a change of the packs is built by a background job within
+minutes, or at once with `occ talk_stickers:packs`.
+
+All settings are optional, and the same keys work with
+`occ config:app:set talk_stickers <key> --value <value>`:
 
 | Key            | Default         | Meaning                                                                                                                                        |
 | -------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |

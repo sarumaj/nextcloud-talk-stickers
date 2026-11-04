@@ -10,6 +10,7 @@ use OCA\TalkStickers\Listener\QuietFolderShareListener;
 use OCA\TalkStickers\Listener\RenderReferenceListener;
 use OCA\TalkStickers\Listener\StickerCommandListener;
 use OCA\TalkStickers\Reference\StickerReferenceProvider;
+use OCA\TalkStickers\Settings\AdminSettings;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -27,6 +28,8 @@ class Application extends App implements IBootstrap {
 
 	public function register(IRegistrationContext $context): void {
 		$context->registerReferenceProvider(StickerReferenceProvider::class);
+		// Administration settings → Additional settings → Talk stickers.
+		$context->registerDeclarativeSettings(AdminSettings::class);
 		// Pages that offer the Smart Picker or show references (Talk, Text, …)
 		// announce it with this event: only then are the picker and widget loaded.
 		$context->registerEventListener(RenderReferenceEvent::class, RenderReferenceListener::class);

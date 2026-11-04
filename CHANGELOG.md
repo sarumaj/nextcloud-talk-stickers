@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- The settings have a page: *Administration settings → Additional settings → Talk stickers*
+  sets the team folder, the packs to offer (a change is built by the background job) and the
+  pack `/sticker` prefers, each change saved as it is made; before, only `occ config:app:set`.
+
 ## 1.7.0 - 2026-11-03
 
 ### Added

@@ -22,7 +22,15 @@ OC.L10N.register(
         "Link copied: paste it into Talk.": "Link skopiowany: wklej go w Talk.",
         "The sticker could not be loaded.": "Nie udało się wczytać naklejki.",
         "Tip: add this page to your home screen to have the stickers at hand. Tap a sticker, then “Share” and choose Talk.": "Wskazówka: dodaj tę stronę do ekranu głównego, żeby mieć naklejki pod ręką. Stuknij naklejkę, potem „Udostępnij” i wybierz Talk.",
-        "OK": "OK"
+        "OK": "OK",
+        "Talk stickers": "Naklejki Talk",
+        "Each change is saved as you make it (there is no Save button).": "Każda zmiana zapisuje się od razu (nie ma przycisku Zapisz).",
+        "Team folder of your own stickers": "Folder zespołu z własnymi naklejkami",
+        "The shared folder with the stickers people add, one subfolder per pack.": "Udostępniony folder z naklejkami dodawanymi przez ludzi, jeden podfolder na pakiet.",
+        "Packs to offer": "Oferowane pakiety",
+        "A change is built by a background job within minutes (or now: occ talk_stickers:packs). None ticked: all.": "Zmianę buduje zadanie w tle w ciągu kilku minut (albo od razu: occ talk_stickers:packs). Nic nie zaznaczone: wszystkie.",
+        "Pack /sticker prefers": "Pakiet preferowany przez /sticker",
+        "When several stickers fit a word equally well.": "Gdy kilka naklejek pasuje do słowa równie dobrze."
     },
     "nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || n!=1 && (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);"
 );

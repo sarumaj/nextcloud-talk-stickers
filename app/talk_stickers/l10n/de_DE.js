@@ -22,7 +22,15 @@ OC.L10N.register(
         "Link copied: paste it into Talk.": "Link kopiert: Fügen Sie ihn in Talk ein.",
         "The sticker could not be loaded.": "Der Sticker konnte nicht geladen werden.",
         "Tip: add this page to your home screen to have the stickers at hand. Tap a sticker, then “Share” and choose Talk.": "Tipp: Fügen Sie diese Seite zum Startbildschirm hinzu, dann haben Sie die Sticker immer zur Hand. Tippen Sie auf einen Sticker, dann auf „Teilen“ und wählen Sie Talk.",
-        "OK": "OK"
+        "OK": "OK",
+        "Talk stickers": "Talk-Sticker",
+        "Each change is saved as you make it (there is no Save button).": "Jede Änderung wird gespeichert, sobald Sie sie machen (es gibt keinen Speichern-Knopf).",
+        "Team folder of your own stickers": "Team-Ordner Ihrer eigenen Sticker",
+        "The shared folder with the stickers people add, one subfolder per pack.": "Der geteilte Ordner mit den Stickern, die Leute hinzufügen, ein Unterordner je Paket.",
+        "Packs to offer": "Angebotene Pakete",
+        "A change is built by a background job within minutes (or now: occ talk_stickers:packs). None ticked: all.": "Eine Änderung baut ein Hintergrundjob binnen Minuten (oder sofort: occ talk_stickers:packs). Keines angehakt: alle.",
+        "Pack /sticker prefers": "Paket, das /sticker bevorzugt",
+        "When several stickers fit a word equally well.": "Wenn mehrere Sticker gleich gut zu einem Wort passen."
     },
     "nplurals=2; plural=(n != 1);"
 );
