@@ -43,4 +43,4 @@ npx --yes markdownlint-cli2 "*.md" "docs/**/*.md"
    3. attaches it to the release, whose text is the version's section of `CHANGELOG.md` (a tag
       without one fails before anything is released);
    4. publishes it on the app store (secret `NC_APPSTORE_TOKEN`; not when the repository's variable
-      `NC_APP_STORE` is `false`).
+      `NC_APPSTORE` is `false`).
