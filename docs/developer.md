@@ -39,7 +39,8 @@ npx --yes markdownlint-cli2 "*.md" "docs/**/*.md"
    `nextcloud-app-release` of `dawid/ci-actions`) then:
 
    1. builds `talk_stickers-X.Y.Z.tar.gz`;
-   2. signs it with the app store key (secret `APP_SIGNING_KEY`);
+   2. signs it with the app store key (secret `NC_APP_SIGNING_KEY`);
    3. attaches it to the release, whose text is the version's section of `CHANGELOG.md` (a tag
       without one fails before anything is released);
-   4. publishes it on the app store (secret `APPSTORE_TOKEN`).
+   4. publishes it on the app store (secret `NC_APPSTORE_TOKEN`; not when the repository's variable
+      `NC_APP_STORE` is `false`).
