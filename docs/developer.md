@@ -31,9 +31,13 @@ npx --yes markdownlint-cli2 "*.md" "docs/**/*.md"
 
 ## Releasing
 
+The release bot (`release-bot` on git.ciepiela.org) does steps 1 to 3 weekly when a release is
+due, from the Conventional Commits since the last tag and the `## Unreleased` entries of
+`CHANGELOG.md` (`.cz.toml`). By hand, at once:
+
 1. Move the `## Unreleased` entries of `CHANGELOG.md` under `## X.Y.Z - YYYY-MM-DD` and set
    `<version>` in `appinfo/info.xml` to `X.Y.Z`.
-2. Commit as `release X.Y.Z`.
+2. Commit as `chore(release): X.Y.Z`.
 3. Tag it, annotated and signed as the earlier tags: `git tag -s vX.Y.Z -m "Talk stickers X.Y.Z"`,
    and push the tag. The release workflow (`.forgejo/workflows/release.yml`, the shared action
    `nextcloud-app-release` of `dawid/ci-actions`) then:

@@ -33,9 +33,10 @@ npx --yes markdownlint-cli2 "*.md" "docs/**/*.md"
 
 ## Conventions
 
-- Commit messages: one line, no trailers. A change comes with its README or `docs/` text and an
-  entry under `## Unreleased` in `CHANGELOG.md` (Keep a Changelog: `### Added`, `### Changed`,
-  `### Fixed`).
+- Commit messages: one line, no trailers, as Conventional Commits with the area as scope
+  (`feat(vault): …`, `fix(inbox): …`, `docs: …`, `chore: …`), which the release bot reads. A change
+  comes with its README or `docs/` text and an entry under `## Unreleased` in `CHANGELOG.md` (Keep a
+  Changelog: `### Added`, `### Changed`, `### Fixed`).
 - Markdown: lines of at most 100 characters (tables excepted), tables aligned.
 - PHP, JavaScript and CSS indented with tabs (`.editorconfig`); PHP formatted by `composer cs:fix`.
   A reformatting is a commit of its own.
@@ -48,12 +49,16 @@ npx --yes markdownlint-cli2 "*.md" "docs/**/*.md"
 
 ## Releasing
 
-1. Move the `## Unreleased` entries under `## X.Y.Z - YYYY-MM-DD` and set `<version>` in
-   `appinfo/info.xml` to `X.Y.Z`.
-2. Commit as `release X.Y.Z`.
-3. Tag it, annotated and signed as the earlier tags:
-   `git tag -s vX.Y.Z -m "Talk stickers X.Y.Z"`, and push the tag.
-   `.forgejo/workflows/release.yml` builds, signs and publishes the release.
+The release bot (`release-bot` on git.ciepiela.org, weekly) releases what is due, from the
+Conventional Commits since the last tag (`feat` a minor, `fix`, `perf`, `refactor` and `fix(deps)` a
+patch, `!` a major) and the `## Unreleased` entries (an `### Added` makes it at least a minor). It
+moves the entries under `## X.Y.Z - YYYY-MM-DD` (adding Renovate's updates as `### Dependencies`),
+sets `<version>` in `appinfo/info.xml` (`.cz.toml`), commits `chore(release): X.Y.Z`, tags `vX.Y.Z`
+signed and pushes; `.forgejo/workflows/release.yml` then releases it.
+
+To release at once by hand: move the entries, set the version, commit `chore(release): X.Y.Z`, tag
+it annotated and signed as the earlier tags (`git tag -s vX.Y.Z -m "Talk stickers X.Y.Z"`) and push
+the tag.
 
 ## Screenshots
 
