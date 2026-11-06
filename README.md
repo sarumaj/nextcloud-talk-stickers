@@ -119,7 +119,8 @@ npx --yes markdownlint-cli2 "*.md" "docs/**/*.md"
 ```
 
 The tests need neither Nextcloud nor network. CI (`.forgejo/workflows/ci.yml`) also lints the PHP
-and JavaScript and checks `appinfo/info.xml` against the app store's schema. The layout, the
+and JavaScript, checks `appinfo/info.xml` against the app store's schema, runs the tests against
+each supported Nextcloud and checks the app on a real Nextcloud with PostgreSQL. The layout, the
 checks and releasing are in [docs/developer.md](docs/developer.md). The code lives at
 [git.ciepiela.org](https://git.ciepiela.org/dawid/nextcloud-talk-stickers); GitHub has a copy.
 

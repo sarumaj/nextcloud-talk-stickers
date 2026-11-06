@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- CI runs the tests against every supported Nextcloud (32 to 36), and checks the app on a real
+  Nextcloud 32 and 35 with PostgreSQL (the shared action `nextcloud-app-server`): installed, then
+  what people get (`tests/server/check.sh`): three stickers of Noto built from their real source,
+  the picker's catalogue, a sticker's image without a sign-in, a sent sticker's link and the page
+  for phones.
+
 ## 1.8.0 - 2026-11-05
 
 ### Added

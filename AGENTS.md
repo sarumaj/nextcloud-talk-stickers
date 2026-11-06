@@ -10,7 +10,7 @@ its sticker packs itself, into its app data, from pinned open-licensed sources.
   - `appinfo/info.xml`, `lib/` (PHP), `js/talk_stickers.js`, `css/`, `templates/`, `l10n/`.
   - `lib/Packs/manifest.json`: the packs' sources, pinned with their SHA-256.
 - `tests/`: PHPUnit tests (no Nextcloud, no network), `tests/l10n.js` (translations complete),
-  `tests/stubs/` (Psalm).
+  `tests/stubs/` (Psalm), `tests/server/check.sh` (the app on a real Nextcloud, CI's job `server`).
 - `docs/user.md`, `docs/admin.md`, `docs/developer.md`: the details the README links to.
 - `screenshots/`: the README's and the app store's pictures.
 - `composer.json`: development tools only (PHPUnit, php-cs-fixer, Psalm); the app needs none.
@@ -29,7 +29,9 @@ npx --yes markdownlint-cli2 "*.md" "docs/**/*.md"
 ```
 
 `appinfo/info.xml` is checked against `https://apps.nextcloud.com/schema/apps/info.xsd` with
-`xmllint --noout --schema`.
+`xmllint --noout --schema`. CI also runs the tests against every Nextcloud from `min-version` to
+`max-version` (`nextcloud/ocp` of each branch), and on a real Nextcloud 32 and 35 with PostgreSQL
+(the job `server`; how to run it locally is in `docs/developer.md`, "Checks").
 
 ## Conventions
 

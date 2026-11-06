@@ -3,8 +3,10 @@
 #
 # The app's PHP and JavaScript must parse, its info.xml must pass the app store's
 # schema, the PHP must follow Nextcloud's coding standard and pass Psalm, the
-# translations must cover every string, the Markdown must pass markdownlint, and
-# the tests (PHPUnit, no Nextcloud and no network) must pass.
+# translations must cover every string, the Markdown must pass markdownlint, the
+# tests (PHPUnit, no Nextcloud and no network) must pass against each supported
+# Nextcloud's public API, and on a real Nextcloud with PostgreSQL the app must
+# install, run and pass tests/server/check.sh.
 name: CI
 # A failed job mails whoever started the run. Renovate's bot has no mailbox: when its
 # branch fails, Renovate opens a pull request, which mails the repository's watchers.
@@ -25,6 +27,11 @@ jobs:
     runs-on: docker
     container: docker.io/library/composer:2
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # The Nextcloud versions info.xml supports (min-version to max-version).
+        ocp: [dev-stable32, dev-stable33, dev-stable34, dev-stable35, dev-master]
     steps:
       - name: Check out
         run: &checkout |
@@ -41,6 +48,22 @@ jobs:
           wget -q -O /tmp/info.xsd https://apps.nextcloud.com/schema/apps/info.xsd
           xmllint --noout --schema /tmp/info.xsd app/talk_stickers/appinfo/info.xml
 
+      - name: Run the tests against Nextcloud's API (${{ matrix.ocp }})
+        run: |
+          composer install -q --no-interaction --no-progress
+          # Newer Nextcloud needs a newer PHP than the lowest one composer.json resolves for.
+          composer config --unset platform.php
+          composer require -q --dev --no-interaction -W "nextcloud/ocp:${{ matrix.ocp }}"
+          vendor/bin/phpunit
+
+  standards:
+    runs-on: docker
+    container: docker.io/library/composer:2
+    timeout-minutes: 10
+    steps:
+      - name: Check out
+        run: *checkout
+
       - name: Install the development tools
         run: composer install -q --no-interaction --no-progress
 
@@ -50,8 +73,33 @@ jobs:
       - name: Check the PHP with Psalm
         run: composer psalm
 
-      - name: Run the tests
-        run: vendor/bin/phpunit
+  server:
+    # A whole Ubuntu with rootless Docker, for Nextcloud and PostgreSQL: the repair
+    # steps, routes, command and pack building that the API package alone does not run.
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        # The oldest Nextcloud info.xml supports and the newest released one (36 has no
+        # image yet; the php job covers it with dev-master).
+        nextcloud: ["32", "35"]
+    steps:
+      - name: Check out
+        run: *checkout
+
+      - name: Check the app on Nextcloud ${{ matrix.nextcloud }}
+        uses: https://git.ciepiela.org/dawid/ci-actions/nextcloud-app-server@main
+        with:
+          app-id: talk_stickers
+          nextcloud: ${{ matrix.nextcloud }}
+          # The stickers are sent in Talk.
+          apps: spreed
+          # All packs are 300 MB of downloads: the check builds three stickers instead.
+          skip-jobs: OCA\TalkStickers\BackgroundJob\BuildPacks
+          check: tests/server/check.sh
+          # Docs or translations alone need no server.
+          paths: app/** tests/server/** .forgejo/workflows/ci.yml
 
   javascript:
     runs-on: docker

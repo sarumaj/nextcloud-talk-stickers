@@ -7,7 +7,7 @@
     `css/`, `templates/`, `l10n/` (German and Polish, `.js` and `.json` alike).
   - `lib/Packs/manifest.json`: the pinned sources of the packs, with their SHA-256.
 - `tests/`: PHPUnit tests (no Nextcloud, no network), `tests/l10n.js` (every translation has every
-  string), `tests/stubs/` (for Psalm).
+  string), `tests/stubs/` (for Psalm), `tests/server/check.sh` (the app on a real Nextcloud).
 - `composer.json`: development tools only (PHPUnit, php-cs-fixer, Psalm); the app needs none.
 - `screenshots/`: the README's and the app store's pictures.
 
@@ -27,7 +27,21 @@ npx --yes markdownlint-cli2 "*.md" "docs/**/*.md"
 ```
 
 `appinfo/info.xml` is checked against `https://apps.nextcloud.com/schema/apps/info.xsd` with
-`xmllint --noout --schema`.
+`xmllint --noout --schema`. CI runs PHPUnit against every Nextcloud from `min-version` to
+`max-version` (`nextcloud/ocp` of each branch).
+
+CI's job `server` checks the app on a real Nextcloud 32 and 35 with PostgreSQL in Docker (the shared
+action `nextcloud-app-server` of `dawid/ci-actions`): installed (over the app store's release once
+there is one), its repair steps and jobs but `BuildPacks` (all packs are 300 MB of downloads),
+disabling and enabling, `tests/server/check.sh` (three stickers of Noto built, the catalogue, a
+sticker's image and link, the page for phones) and no error of the app in `nextcloud.log`. Locally,
+with Docker (`--keep` leaves it at `http://localhost:8080`):
+
+```bash
+curl -fsSLO https://git.ciepiela.org/dawid/ci-actions/raw/branch/main/nextcloud-app-server.py
+python3 nextcloud-app-server.py run --app-dir app/talk_stickers --nextcloud 32 --apps spreed \
+  --skip-job 'OCA\TalkStickers\BackgroundJob\BuildPacks' --check tests/server/check.sh
+```
 
 ## Releasing
 
