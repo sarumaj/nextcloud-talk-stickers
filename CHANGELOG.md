@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.9.0 - 2026-11-09
+
 ### Added
 
 - CI runs the tests against every supported Nextcloud (32 to 36), and checks the app on a real
