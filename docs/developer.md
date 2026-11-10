@@ -9,6 +9,7 @@
 - `tests/`: PHPUnit tests (no Nextcloud, no network), `tests/l10n.js` (every translation has every
   string), `tests/stubs/` (for Psalm), `tests/server/check.sh` (the app on a real Nextcloud).
 - `composer.json`: development tools only (PHPUnit, php-cs-fixer, Psalm); the app needs none.
+  The tools need PHP 8.4 (`config.platform.php`, for PHPUnit 13); the app runs on PHP 8.2.
 - `screenshots/`: the README's and the app store's pictures.
 
 ## Checks

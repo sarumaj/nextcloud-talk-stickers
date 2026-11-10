@@ -26,18 +26,18 @@ class AdminSettingsTest extends TestCase {
 	private array $queued = [];
 
 	private function form(): AdminSettings {
-		$config = $this->createMock(IAppConfig::class);
+		$config = $this->createStub(IAppConfig::class);
 		$config->method('getValueString')->willReturnCallback(fn (string $app, string $key, string $default = '') => $this->config[$key] ?? $default);
 		$config->method('setValueString')->willReturnCallback(function (string $app, string $key, string $value): bool {
 			$this->config[$key] = $value;
 			return true;
 		});
-		$jobs = $this->createMock(IJobList::class);
+		$jobs = $this->createStub(IJobList::class);
 		$jobs->method('has')->willReturnCallback(fn (string $job) => in_array($job, $this->queued, true));
 		$jobs->method('add')->willReturnCallback(function (string $job): void {
 			$this->queued[] = $job;
 		});
-		$l = $this->createMock(IL10N::class);
+		$l = $this->createStub(IL10N::class);
 		$l->method('t')->willReturnArgument(0);
 		return new AdminSettings($config, $jobs, $l);
 	}
@@ -52,7 +52,7 @@ class AdminSettingsTest extends TestCase {
 
 	public function testThePacksAreBoxesAndAChangeIsBuiltAnew(): void {
 		$form = $this->form();
-		$user = $this->createMock(IUser::class);
+		$user = $this->createStub(IUser::class);
 		$all = json_decode((string)$form->getValue('packs', $user), true);
 		$this->assertSame(['fluent', 'noto-animated', 'noto', 'openmoji', 'twemoji'], array_keys($all));
 		$this->assertNotContains(false, $all, 'none set: all');
@@ -69,7 +69,7 @@ class AdminSettingsTest extends TestCase {
 
 	public function testTheFolderAndThePreferredPack(): void {
 		$form = $this->form();
-		$user = $this->createMock(IUser::class);
+		$user = $this->createStub(IUser::class);
 		$this->assertSame('Stickers', $form->getValue('folder', $user));
 		$form->setValue('folder', ' /Our stickers/ ', $user);
 		$this->assertSame('Our stickers', $this->config['folder']);

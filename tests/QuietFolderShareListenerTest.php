@@ -39,9 +39,9 @@ class QuietFolderShareListenerTest extends TestCase {
 		$ben = $this->user('ben');
 		$anna = $this->user('anna');
 		$manager = $this->createMock(ShareManager33::class);
-		$manager->method('getUsersForShare')->with($share)->willReturn([$ben, $anna]);
+		$manager->expects($this->once())->method('getUsersForShare')->with($share)->willReturn([$ben, $anna]);
 		$dispatched = [];
-		$dispatcher = $this->createMock(IEventDispatcher::class);
+		$dispatcher = $this->createStub(IEventDispatcher::class);
 		$dispatcher->method('dispatchTyped')->willReturnCallback(function (Event $event) use (&$dispatched): void {
 			$dispatched[] = $event;
 		});
@@ -74,7 +74,7 @@ class QuietFolderShareListenerTest extends TestCase {
 	}
 
 	private function roomShare(string $token): IShare {
-		$share = $this->createMock(IShare::class);
+		$share = $this->createStub(IShare::class);
 		$share->method('getShareType')->willReturn(IShare::TYPE_ROOM);
 		$share->method('getSharedWith')->willReturn($token);
 		$share->method('getShareOwner')->willReturn('ben');
@@ -83,7 +83,7 @@ class QuietFolderShareListenerTest extends TestCase {
 	}
 
 	private function user(string $uid): IUser {
-		$user = $this->createMock(IUser::class);
+		$user = $this->createStub(IUser::class);
 		$user->method('getUID')->willReturn($uid);
 		return $user;
 	}

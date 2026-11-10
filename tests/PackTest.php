@@ -14,10 +14,10 @@ use PHPUnit\Framework\TestCase;
 class PackTest extends TestCase {
 	public function testOrderCategoriesAndSkippedFiles(): void {
 		$written = [];
-		$folder = $this->createMock(ISimpleFolder::class);
+		$folder = $this->createStub(ISimpleFolder::class);
 		$folder->method('newFile')->willReturnCallback(function (string $name) use (&$written) {
 			$written[] = $name;
-			return $this->createMock(\OCP\Files\SimpleFS\ISimpleFile::class);
+			return $this->createStub(\OCP\Files\SimpleFS\ISimpleFile::class);
 		});
 		$png = "\x89PNG\r\n\x1a\nrest";
 		$spec = ['id' => 'test', 'title' => 'Test', 'license' => 'MIT', 'licenseUrl' => 'u', 'source' => 's', 'attribution' => 'a'];

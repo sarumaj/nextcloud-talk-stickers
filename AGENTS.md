@@ -14,6 +14,7 @@ its sticker packs itself, into its app data, from pinned open-licensed sources.
 - `docs/user.md`, `docs/admin.md`, `docs/developer.md`: the details the README links to.
 - `screenshots/`: the README's and the app store's pictures.
 - `composer.json`: development tools only (PHPUnit, php-cs-fixer, Psalm); the app needs none.
+  The tools need PHP 8.4 (`config.platform.php`, for PHPUnit 13); the app runs on PHP 8.2.
 
 ## Checks
 
