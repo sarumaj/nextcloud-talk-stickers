@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="6.20.7@d60ecdbc9e577e67b29f632e3e3847dffd14b7ce">
+<files psalm-version="7.3.2@5ae5547150b3b097f8027e64770abaf1a5ef761c">
+  <file src="app/talk_stickers/lib/Listener/QuietFolderShareListener.php">
+    <TypeDoesNotContainType>
+      <code><![CDATA[!class_exists($class)]]></code>
+    </TypeDoesNotContainType>
+  </file>
   <file src="app/talk_stickers/lib/Listener/StickerCommandListener.php">
     <InvalidArgument>
       <code><![CDATA[$gif]]></code>
