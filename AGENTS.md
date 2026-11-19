@@ -21,7 +21,7 @@ its sticker packs itself, into its app data, from pinned open-licensed sources.
 Run what CI runs for what you changed, and look at each exit code:
 
 ```bash
-composer install                                          # composer:2 in Docker if missing
+composer install                                          # PHP 8.5: php:8.5-cli-alpine, as CI
 find app -name '*.php' -print0 | xargs -0 -n1 php -l
 vendor/bin/phpunit
 composer cs:check && composer psalm
