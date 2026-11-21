@@ -15,9 +15,8 @@
 ## Checks
 
 CI (`.forgejo/workflows/ci.yml`) runs these; run them for what you changed and look at each exit
-code. Without PHP or Composer, run them in `docker.io/library/php:8.5-cli-alpine` with the
-first step of CI's `php` job (git, the zip and bz2 extensions, Composer); `composer:2` has PHP
-8.6 since 2026-11-19, which the tools do not support yet.
+code. Without PHP or Composer, run them in `docker.io/library/php:8.6-cli-alpine` with the
+first step of CI's `php` job (git, the zip, bz2 and mbstring extensions, Composer).
 
 ```bash
 composer install
