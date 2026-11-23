@@ -21,6 +21,10 @@
     </projectFiles>
     <stubs>
         <file name="tests/stubs/oc_hooks_emitter.php" preloadClasses="true"/>
+        <!-- files_sharing's event (Nextcloud 33), which nextcloud/ocp does not contain, and the
+             classes of the imagick extension StickerService uses where it is installed. -->
+        <file name="tests/stubs/files_sharing_events.php" preloadClasses="true"/>
+        <file name="tests/stubs/imagick.php" preloadClasses="true"/>
     </stubs>
     <issueHandlers>
         <!-- #[\Override] needs PHP 8.3; the app runs on 8.2. -->
