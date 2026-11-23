@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace OCA\TalkStickers\Listener;
 
+use OCA\Files_Sharing\Event\UserShareAccessUpdatedEvent;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\EventDispatcher\IEventListener;
@@ -37,9 +38,6 @@ class QuietFolderShareListener implements IEventListener {
 	/** The conversation's token while its folder share is created, else null. */
 	public static ?string $quietFor = null;
 
-	/** files_sharing's event that updates the mounts of users' received shares. */
-	public const SHARE_ACCESS_UPDATED_EVENT = 'OCA\\Files_Sharing\\Event\\UserShareAccessUpdatedEvent';
-
 	public function __construct(
 		private IEventDispatcher $dispatcher,
 		private IShareManager $shareManager,
@@ -47,13 +45,24 @@ class QuietFolderShareListener implements IEventListener {
 	}
 
 	public function handle(Event $event): void {
-		if (self::$quietFor === null || !method_exists($event, 'getShare')) {
+		if (self::$quietFor === null) {
 			return;
 		}
-		$share = $event->getShare();
+		// ShareCreatedEvent apart from the others with getShare() (Talk's
+		// BeforeDuplicateShareSentEvent): method_exists() narrows $event to an object
+		// with that method, which Psalm then never takes for ShareCreatedEvent.
+		if ($event instanceof ShareCreatedEvent) {
+			$this->quiet($event, $event->getShare(), true);
+		} elseif (method_exists($event, 'getShare')) {
+			$this->quiet($event, $event->getShare(), false);
+		}
+	}
+
+	/** Stops the event if its share is the conversation's folder share; mounts a new one. */
+	private function quiet(Event $event, mixed $share, bool $created): void {
 		if ($share instanceof IShare && $share->getShareType() === IShare::TYPE_ROOM && $share->getSharedWith() === self::$quietFor) {
 			$event->stopPropagation();
-			if ($event instanceof ShareCreatedEvent) {
+			if ($created) {
 				$this->updateRecipients($share);
 			}
 		}
@@ -61,8 +70,9 @@ class QuietFolderShareListener implements IEventListener {
 
 	/** What files_sharing would have done on ShareCreatedEvent: mount the share for its recipients. */
 	private function updateRecipients(IShare $share): void {
-		$class = self::SHARE_ACCESS_UPDATED_EVENT;
-		if (!class_exists($class) || !method_exists($this->shareManager, 'getUsersForShare')) {
+		// files_sharing's event that updates the mounts of users' received shares: not in
+		// nextcloud/ocp (Psalm has a stub of it), and only since Nextcloud 33.
+		if (!class_exists(UserShareAccessUpdatedEvent::class) || !method_exists($this->shareManager, 'getUsersForShare')) {
 			return;
 		}
 		$users = [];
@@ -72,7 +82,7 @@ class QuietFolderShareListener implements IEventListener {
 			}
 		}
 		if ($users !== []) {
-			$this->dispatcher->dispatchTyped(new $class($users));
+			$this->dispatcher->dispatchTyped(new UserShareAccessUpdatedEvent($users));
 		}
 	}
 }

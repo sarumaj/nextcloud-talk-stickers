@@ -19,11 +19,4 @@
       <code><![CDATA[ceil($size / 512) * 512]]></code>
     </InvalidOperand>
   </file>
-  <file src="app/talk_stickers/lib/Service/StickerService.php">
-    <UndefinedClass>
-      <code><![CDATA[\Imagick]]></code>
-      <code><![CDATA[\ImagickException]]></code>
-      <code><![CDATA[\ImagickPixel]]></code>
-    </UndefinedClass>
-  </file>
 </files>
