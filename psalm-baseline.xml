@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="6.20.7@d60ecdbc9e577e67b29f632e3e3847dffd14b7ce">
+<files psalm-version="7.12.0@67cfa8476f9f2d666a5d3b54817738d1536afa77">
   <file src="app/talk_stickers/lib/Listener/StickerCommandListener.php">
     <InvalidArgument>
       <code><![CDATA[$gif]]></code>
